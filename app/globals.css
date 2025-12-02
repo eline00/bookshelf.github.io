@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-color: #050505;
+  --text-color: #e5e5e5;
+  --accent-color: #ccff00; /* Neon Lime */
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+  margin: 0;
+  cursor: crosshair;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* Ambient Background */
+#ambient-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease, background 0.6s ease;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+/* Stream Layout */
+#stream-wrapper {
+  position: relative;
+  z-index: 10;
+  padding-top: 20vh;
+  padding-bottom: 20vh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-left: 15vw;
+  will-change: transform;
+}
+
+/* The Timeline Line */
+#timeline-rail {
+  position: absolute;
+  left: 10vw;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 5;
+}
+
+/* Year Markers */
+.year-marker {
+  position: relative;
+  margin-bottom: 4rem;
+  margin-top: 8rem;
+}
+
+/* The dot on the timeline */
+.year-marker::before {
+  content: '';
+  position: absolute;
+  left: -5vw;
+  top: 0.6em;
+  width: 12px;
+  height: 12px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  box-shadow: 0 0 15px var(--accent-color);
+  transform: translateX(-50%);
+}
+
+.year-title {
+  font-weight: 900;
+  font-size: 4rem;
+  line-height: 1;
+  color: #fff;
+}
+
+.year-goal {
+  font-family: monospace;
+  color: var(--accent-color);
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+/* Year Status Stamp */
+.year-status {
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+  padding: 2rem;
+  border: 1px solid #333;
+  display: inline-block;
+  transform: rotate(-2deg);
+}
+
+.year-status h3 {
+  font-weight: 900;
+  font-size: 2rem;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.year-status span {
+  font-family: monospace;
+  color: #888;
+}
+
+/* Book Items */
+.book-item {
+  line-height: 0.9;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.3s ease, opacity 0.3s ease;
+  user-select: none;
+  will-change: transform, font-variation-settings;
+  transform-origin: left center;
+}
+
+.is-hovering .book-item {
+  opacity: 0.1;
+  filter: blur(2px);
+}
+
+.is-hovering .book-item:hover {
+  opacity: 1;
+  filter: blur(0);
+  z-index: 20;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(255,255,255,0.5);
+}
+
+/* Modal */
+#modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #050505;
+  z-index: 100;
+  transform: translateY(100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+}
+
+.reveal-text span {
+  opacity: 0;
+  display: inline-block;
+  transform: translateY(20px);
+}
+
+.meta-tag {
+  font-size: 0.8rem;
+  border: 1px solid #333;
+  padding: 0.2em 0.6em;
+  border-radius: 100px;
+  margin-right: 10px;
+  color: #888;
+}
