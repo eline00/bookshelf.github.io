@@ -1,7 +1,7 @@
-export const yearlyGoals = {
-  2024: { target: 12, label: "Habit Formation" },
-  2025: { target: 15, label: "Deep Dive Sci-Fi" },
-  2026: { target: 20, label: "Consistency" }
+export const yearlyGoals: Record<number, number> = {
+  2024: 20,
+  2025: 40,
+  2026: 60,
 };
 
 export interface Book {
@@ -16,30 +16,638 @@ export interface Book {
   notes: string;
 }
 
+// Helper function to get cover image URL
+// Uses local images stored in /public/covers/
+export const getBookCover = (book: Book): string => {
+  // All covers are stored locally by book ID
+  return `/covers/${book.id}.jpg`;
+};
+
+// Books extracted from Goodreads - organized by read date
 export const books: Book[] = [
   // 2024 Books
-  { id: 1, title: "Dune", author: "Frank Herbert", year: 2024, rating: 5, pages: 412, genre: "Sci-Fi", date: "2024-01-15", notes: "Masterpiece world building." },
-  { id: 2, title: "The Hobbit", author: "J.R.R. Tolkien", year: 2024, rating: 4, pages: 310, genre: "Fantasy", date: "2024-02-10", notes: "Comfort read." },
-  { id: 3, title: "1984", author: "George Orwell", year: 2024, rating: 4.5, pages: 328, genre: "Classic", date: "2024-03-12", notes: "Chillingly relevant." },
-  { id: 4, title: "Sapiens", author: "Yuval Noah Harari", year: 2024, rating: 5, pages: 443, genre: "Non-Fiction", date: "2024-04-20", notes: "Changed my perspective." },
-  { id: 10, title: "Name of the Wind", author: "Patrick Rothfuss", year: 2024, rating: 5, pages: 662, genre: "Fantasy", date: "2024-05-20", notes: "Beautiful prose." },
-  { id: 12, title: "Educated", author: "Tara Westover", year: 2024, rating: 5, pages: 352, genre: "Non-Fiction", date: "2024-07-18", notes: "Heartbreaking memoir." },
+  {
+    id: 6942919341,
+    title: "A Court of Thorns and Roses",
+    author: "Sarah J. Maas",
+    year: 2024,
+    rating: 3,
+    pages: 419,
+    genre: "Romantasy",
+    date: "Oct 05, 2024",
+    notes: "None",
+  },
+  {
+    id: 6942935033,
+    title: "A Court of Mist and Fury",
+    author: "Sarah J. Maas",
+    year: 2024,
+    rating: 5,
+    pages: 626,
+    genre: "Romantasy",
+    date: "Oct 10, 2024",
+    notes: "None",
+  },
+  {
+    id: 50659472,
+    title: "A Court of Wings and Ruin",
+    author: "Sarah J. Maas",
+    year: 2024,
+    rating: 4,
+    pages: 699,
+    genre: "Romantasy",
+    date: "Oct 14, 2024",
+    notes: "None",
+  },
+  {
+    id: 50659471,
+    title: "A Court of Frost and Starlight",
+    author: "Sarah J. Maas",
+    year: 2024,
+    rating: 3,
+    pages: 272,
+    genre: "Romantasy",
+    date: "Oct 16, 2024",
+    notes: "None",
+  },
+  {
+    id: 53138095,
+    title: "A Court of Silver Flames",
+    author: "Sarah J. Maas",
+    year: 2024,
+    rating: 5,
+    pages: 757,
+    genre: "Romantasy",
+    date: "Oct 18, 2024",
+    notes: "None",
+  },
+  {
+    id: 61431922,
+    title: "Fourth Wing",
+    author: "Rebecca Yarros",
+    year: 2024,
+    rating: 5,
+    pages: 517,
+    genre: "Romantasy",
+    date: "Oct 20, 2024",
+    notes: "None",
+  },
+  {
+    id: 202533930,
+    title: "Iron Flame",
+    author: "Rebecca Yarros",
+    year: 2024,
+    rating: 4,
+    pages: 623,
+    genre: "Romantasy",
+    date: "Oct 31, 2024",
+    notes: "None",
+  },
+  {
+    id: 76703559,
+    title: "Throne of Glass",
+    author: "Sarah J. Maas",
+    year: 2024,
+    rating: 3,
+    pages: 406,
+    genre: "Fantasy",
+    date: "Nov 10, 2024",
+    notes: "None",
+  },
+  {
+    id: 76705490,
+    title: "Crown of Midnight",
+    author: "Sarah J. Maas",
+    year: 2024,
+    rating: 3,
+    pages: 420,
+    genre: "Fantasy",
+    date: "Nov 14, 2024",
+    notes: "None",
+  },
+  {
+    id: 76706470,
+    title: "Heir of Fire",
+    author: "Sarah J. Maas",
+    year: 2024,
+    rating: 4,
+    pages: 576,
+    genre: "Fantasy",
+    date: "Nov 18, 2024",
+    notes: "None",
+  },
+  {
+    id: 126062562,
+    title: "The Assassin's Blade",
+    author: "Sarah J. Maas",
+    year: 2024,
+    rating: 3,
+    pages: 451,
+    genre: "Fantasy",
+    date: "Nov 21, 2024",
+    notes: "None",
+  },
+  {
+    id: 76707900,
+    title: "Queen of Shadows",
+    author: "Sarah J. Maas",
+    year: 2024,
+    rating: 4,
+    pages: 648,
+    genre: "Fantasy",
+    date: "Nov 25, 2024",
+    notes: "None",
+  },
+  {
+    id: 76713323,
+    title: "Empire of Storms",
+    author: "Sarah J. Maas",
+    year: 2024,
+    rating: 5,
+    pages: 733,
+    genre: "Fantasy",
+    date: "Nov 30, 2024",
+    notes: "None",
+  },
+  {
+    id: 76714487,
+    title: "Tower of Dawn",
+    author: "Sarah J. Maas",
+    year: 2024,
+    rating: 5,
+    pages: 688,
+    genre: "Fantasy",
+    date: "Nov 30, 2024",
+    notes: "None",
+  },
+  {
+    id: 76715522,
+    title: "Kingdom of Ash",
+    author: "Sarah J. Maas",
+    year: 2024,
+    rating: 5,
+    pages: 984,
+    genre: "Fantasy",
+    date: "Dec 05, 2024",
+    notes: "None",
+  },
+  {
+    id: 217536270,
+    title: "Quicksilver",
+    author: "Callie Hart",
+    year: 2024,
+    rating: 5,
+    pages: 624,
+    genre: "Romantasy",
+    date: "Dec 26, 2024",
+    notes: "None",
+  },
 
   // 2025 Books
-  { id: 5, title: "Mistborn", author: "Brandon Sanderson", year: 2025, rating: 5, pages: 541, genre: "Fantasy", date: "2025-01-22", notes: "Great magic system." },
-  { id: 6, title: "Foundation", author: "Isaac Asimov", year: 2025, rating: 4, pages: 255, genre: "Sci-Fi", date: "2025-02-28", notes: "Grand scope." },
-  { id: 7, title: "Pride & Prejudice", author: "Jane Austen", year: 2025, rating: 4, pages: 279, genre: "Classic", date: "2025-03-10", notes: "Witty banter." },
-  { id: 11, title: "Hyperion", author: "Dan Simmons", year: 2025, rating: 4.5, pages: 482, genre: "Sci-Fi", date: "2025-06-15", notes: "Unique structure." },
-
-  // 2026 Books
-  { id: 8, title: "Three-Body Problem", author: "Cixin Liu", year: 2026, rating: 5, pages: 400, genre: "Sci-Fi", date: "2026-01-18", notes: "Mind bending." },
-  { id: 9, title: "Atomic Habits", author: "James Clear", year: 2026, rating: 4.5, pages: 320, genre: "Non-Fiction", date: "2026-02-10", notes: "Practical advice." }
+  {
+    id: 44778083,
+    title: "House of Earth and Blood",
+    author: "Sarah J. Maas",
+    year: 2025,
+    rating: 3,
+    pages: 803,
+    genre: "Romantasy",
+    date: "Jan 07, 2025",
+    notes: "None",
+  },
+  {
+    id: 40132775,
+    title: "House of Sky and Breath",
+    author: "Sarah J. Maas",
+    year: 2025,
+    rating: 4,
+    pages: 805,
+    genre: "Romantasy",
+    date: "Jan 15, 2025",
+    notes: "None",
+  },
+  {
+    id: 52857700,
+    title: "House of Flame and Shadow",
+    author: "Sarah J. Maas",
+    year: 2025,
+    rating: 5,
+    pages: 835,
+    genre: "Romantasy",
+    date: "Jan 26, 2025",
+    notes: "None",
+  },
+  {
+    id: 61431922,
+    title: "Fourth Wing",
+    author: "Rebecca Yarros",
+    year: 2025,
+    rating: 5,
+    pages: 517,
+    genre: "Romantasy",
+    date: "Feb 01, 2025",
+    notes: "Re-read",
+  },
+  {
+    id: 202533930,
+    title: "Iron Flame",
+    author: "Rebecca Yarros",
+    year: 2025,
+    rating: 4,
+    pages: 623,
+    genre: "Romantasy",
+    date: "Feb 10, 2025",
+    notes: "Re-read",
+  },
+  {
+    id: 209439446,
+    title: "Onyx Storm",
+    author: "Rebecca Yarros",
+    year: 2025,
+    rating: 4,
+    pages: 544,
+    genre: "Romantasy",
+    date: "Feb 18, 2025",
+    notes: "None",
+  },
+  {
+    id: 202507554,
+    title: "When the Moon Hatched",
+    author: "Sarah A. Parker",
+    year: 2025,
+    rating: 3,
+    pages: 718,
+    genre: "Romantasy",
+    date: "Mar 06, 2025",
+    notes: "None",
+  },
+  {
+    id: 60039506,
+    title: "Manacled",
+    author: "SenLinYu",
+    year: 2025,
+    rating: 4,
+    pages: 945,
+    genre: "Fanfic",
+    date: "Mar 15, 2025",
+    notes: "Re-read",
+  },
+  {
+    id: 58340706,
+    title: "One Dark Window",
+    author: "Rachel Gillig",
+    year: 2025,
+    rating: 5,
+    pages: 432,
+    genre: "Romantasy",
+    date: "Mar 18, 2025",
+    notes: "None",
+  },
+  {
+    id: 63910262,
+    title: "Two Twisted Crowns",
+    author: "Rachel Gillig",
+    year: 2025,
+    rating: 5,
+    pages: 437,
+    genre: "Romantasy",
+    date: "Mar 23, 2025",
+    notes: "None",
+  },
+  {
+    id: 58763686,
+    title: "Haunting Adeline",
+    author: "H.D. Carlton",
+    year: 2025,
+    rating: 2,
+    pages: 583,
+    genre: "Dark Romance",
+    date: "Mar 28, 2025",
+    notes: "None",
+  },
+  {
+    id: 59050133,
+    title: "Hunting Adeline",
+    author: "H.D. Carlton",
+    year: 2025,
+    rating: 2,
+    pages: 684,
+    genre: "Dark Romance",
+    date: "Apr 09, 2025",
+    notes: "None",
+  },
+  {
+    id: 60714999,
+    title: "The Serpent and the Wings of Night",
+    author: "Carissa Broadbent",
+    year: 2025,
+    rating: 5,
+    pages: 504,
+    genre: "Romantasy",
+    date: "Apr 12, 2025",
+    notes: "None",
+  },
+  {
+    id: 217454286,
+    title: "The Ashes and the Star-Cursed King",
+    author: "Carissa Broadbent",
+    year: 2025,
+    rating: 4,
+    pages: 737,
+    genre: "Romantasy",
+    date: "Apr 25, 2025",
+    notes: "None",
+  },
+  {
+    id: 7406308212,
+    title: "The Book of Azrael",
+    author: "Amber V. Nicole",
+    year: 2025,
+    rating: 5,
+    pages: 572,
+    genre: "Romantasy",
+    date: "May 01, 2025",
+    notes: "None",
+  },
+  {
+    id: 7484619744,
+    title: "The Throne of Broken Gods",
+    author: "Amber V. Nicole",
+    year: 2025,
+    rating: 5,
+    pages: 728,
+    genre: "Romantasy",
+    date: "May 08, 2025",
+    notes: "None",
+  },
+  {
+    id: 7484619994,
+    title: "The Dawn of the Cursed Queen",
+    author: "Amber V. Nicole",
+    year: 2025,
+    rating: 5,
+    pages: 581,
+    genre: "Romantasy",
+    date: "May 21, 2025",
+    notes: "None",
+  },
+  {
+    id: 7623814621,
+    title: "Animal Farm",
+    author: "George Orwell",
+    year: 2025,
+    rating: 5,
+    pages: 141,
+    genre: "Fiction",
+    date: "Jun 03, 2025",
+    notes: "None",
+  },
+  {
+    id: 6942919341,
+    title: "A Court of Thorns and Roses",
+    author: "Sarah J. Maas",
+    year: 2025,
+    rating: 3,
+    pages: 419,
+    genre: "Romantasy",
+    date: "Jun 24, 2025",
+    notes: "None",
+  },
+  {
+    id: 6942935033,
+    title: "A Court of Mist and Fury",
+    author: "Sarah J. Maas",
+    year: 2025,
+    rating: 5,
+    pages: 626,
+    genre: "Romantasy",
+    date: "Jun 30, 2025",
+    notes: "None",
+  },
+  {
+    id: 7406314349,
+    title: "Yellowface",
+    author: "R.F. Kuang",
+    year: 2025,
+    rating: 3,
+    pages: 319,
+    genre: "Fiction",
+    date: "Jul 04, 2025",
+    notes: "None",
+  },
+  {
+    id: 7633325425,
+    title: "Heartless Hunter",
+    author: "Kristen Ciccarelli",
+    year: 2025,
+    rating: 5,
+    pages: 406,
+    genre: "Romantasy",
+    date: "Jul 10, 2025",
+    notes: "None",
+  },
+  {
+    id: 7406309737,
+    title: "Rebel Witch",
+    author: "Kristen Ciccarelli",
+    year: 2025,
+    rating: 5,
+    pages: 464,
+    genre: "Romantasy",
+    date: "Jul 12, 2025",
+    notes: "None",
+  },
+  {
+    id: 7406309075,
+    title: "The Awakening",
+    author: "Caroline Peckham",
+    year: 2025,
+    rating: 5,
+    pages: 436,
+    genre: "Romantasy",
+    date: "Jul 15, 2025",
+    notes: "None",
+  },
+  {
+    id: 7772482866,
+    title: "Ruthless Fae",
+    author: "Caroline Peckham",
+    year: 2025,
+    rating: 4,
+    pages: 475,
+    genre: "Romantasy",
+    date: "Jul 20, 2025",
+    notes: "None",
+  },
+  {
+    id: 7772483376,
+    title: "The Reckoning",
+    author: "Caroline Peckham",
+    year: 2025,
+    rating: 5,
+    pages: 562,
+    genre: "Romantasy",
+    date: "Jul 25, 2025",
+    notes: "None",
+  },
+  {
+    id: 7772484327,
+    title: "Dark Fae",
+    author: "Caroline Peckham",
+    year: 2025,
+    rating: 3,
+    pages: 536,
+    genre: "Romantasy",
+    date: "Jul 28, 2025",
+    notes: "None",
+  },
+  {
+    id: 7779097113,
+    title: "Savage Fae",
+    author: "Caroline Peckham",
+    year: 2025,
+    rating: 2,
+    pages: 513,
+    genre: "Romantasy",
+    date: "Jul 28, 2025",
+    notes: "None",
+  },
+  {
+    id: 7797888957,
+    title: "Vicious Fae",
+    author: "Caroline Peckham",
+    year: 2025,
+    rating: 2,
+    pages: 678,
+    genre: "Romantasy",
+    date: "Aug 05, 2025",
+    notes: "None",
+  },
+  {
+    id: 7830749722,
+    title: "Broken Fae",
+    author: "Caroline Peckham",
+    year: 2025,
+    rating: 2,
+    pages: 664,
+    genre: "Romantasy",
+    date: "Aug 14, 2025",
+    notes: "None",
+  },
+  {
+    id: 7830750304,
+    title: "Warrior Fae",
+    author: "Caroline Peckham",
+    year: 2025,
+    rating: 2,
+    pages: 680,
+    genre: "Romantasy",
+    date: "Sep 19, 2025",
+    notes: "None",
+  },
+  {
+    id: 7955981318,
+    title: "Shadow Princess",
+    author: "Caroline Peckham",
+    year: 2025,
+    rating: 4,
+    pages: 724,
+    genre: "Romantasy",
+    date: "Sep 24, 2025",
+    notes: "None",
+  },
+  {
+    id: 7955983836,
+    title: "Cursed Fates",
+    author: "Caroline Peckham",
+    year: 2025,
+    rating: 4,
+    pages: 886,
+    genre: "Romantasy",
+    date: "Sep 28, 2025",
+    notes: "None",
+  },
+  {
+    id: 7955985284,
+    title: "Fated Throne",
+    author: "Caroline Peckham",
+    year: 2025,
+    rating: 4,
+    pages: 823,
+    genre: "Romantasy",
+    date: "Oct 07, 2025",
+    notes: "None",
+  },
 ];
 
 export const genreGradients: Record<string, string> = {
-  'Sci-Fi': 'linear-gradient(45deg, #000428, #004e92)',
-  'Fantasy': 'linear-gradient(45deg, #134E5E, #71B280)',
-  'Classic': 'linear-gradient(45deg, #4b0000, #8E0E00)',
-  'Non-Fiction': 'linear-gradient(45deg, #FF8008, #FFC837)',
-  'default': 'linear-gradient(45deg, #232526, #414345)'
+  Fantasy: "linear-gradient(45deg, #134E5E, #71B280)",
+  Fiction: "linear-gradient(45deg, #4b0000, #8E0E00)",
+  Romance: "linear-gradient(45deg, #ee9ca7, #ffdde1)",
+  "Dark Romance": "linear-gradient(45deg, #1a1a2e, #16213e)",
+  Romantasy: "linear-gradient(45deg, #667eea, #764ba2)",
+  Fanfic: "linear-gradient(45deg, #f093fb, #f5576c)",
+  Thriller: "linear-gradient(45deg, #000428, #004e92)",
+  "Non-Fiction": "linear-gradient(45deg, #FF8008, #FFC837)",
+  default: "linear-gradient(45deg, #232526, #414345)",
+};
+
+// Book cover dominant colors - extracted from cover images
+// Used for ambient background effects on hover
+export const bookCoverColors: Record<number, string> = {
+  // ACOTAR Series - deep reds and blacks
+  6942919341: "#8B0000", // A Court of Thorns and Roses - dark red
+  6942935033: "#1a1a3e", // A Court of Mist and Fury - deep blue/purple
+  50659472: "#8B4513", // A Court of Wings and Ruin - bronze/brown
+  50659471: "#2F4F4F", // A Court of Frost and Starlight - dark slate
+  53138095: "#800020", // A Court of Silver Flames - burgundy
+  // Empyrean Series - blacks and golds
+  61431922: "#1a1a1a", // Fourth Wing - black with gold accents
+  202533930: "#8B4513", // Iron Flame - copper/bronze
+  209439446: "#0a0a0a", // Onyx Storm - deep black
+  // Throne of Glass Series - greens and golds
+  76703559: "#2d5a27", // Throne of Glass - forest green
+  76705490: "#1a1a3e", // Crown of Midnight - midnight blue
+  76706470: "#8B4513", // Heir of Fire - fiery orange/brown
+  126062562: "#2d2d2d", // The Assassin's Blade - dark gray
+  76707900: "#4a0e4e", // Queen of Shadows - deep purple
+  76713323: "#1a3a5c", // Empire of Storms - stormy blue
+  76714487: "#c4a35a", // Tower of Dawn - golden
+  76715522: "#1a1a1a", // Kingdom of Ash - charcoal black
+  // Crescent City Series - vibrant colors
+  44778083: "#8B0000", // House of Earth and Blood - crimson
+  40132775: "#1e3a5f", // House of Sky and Breath - navy blue
+  52857700: "#4a0e4e", // House of Flame and Shadow - purple/flame
+  // Other Books
+  217536270: "#c0c0c0", // Quicksilver - silver
+  202507554: "#2d3436", // When the Moon Hatched - dark teal
+  58340706: "#1a1a2e", // One Dark Window - dark navy
+  63910262: "#2d1f3d", // Two Twisted Crowns - deep purple
+  58763686: "#1a1a1a", // Haunting Adeline - black
+  59050133: "#8B0000", // Hunting Adeline - blood red
+  60714999: "#0d1b2a", // The Serpent and the Wings of Night - midnight
+  217454286: "#3d1c02", // The Ashes and the Star-Cursed King - burnt orange
+  7623814621: "#90EE90", // Animal Farm - pastoral green
+  7406314349: "#FFD700", // Yellowface - yellow
+  7633325425: "#8B0000", // Heartless Hunter - crimson
+  7406309737: "#4a0e4e", // Rebel Witch - purple
+  // Zodiac Academy Series - cosmic purples and blues
+  7406309075: "#1a1a3e", // The Awakening - cosmic blue
+  7772482866: "#4a0e4e", // Ruthless Fae - purple
+  7772483376: "#1a3a5c", // The Reckoning - stormy blue
+  7955981318: "#2d1f3d", // Shadow Princess - dark purple
+  7955983836: "#0d1b2a", // Cursed Fates - midnight blue
+  7955985284: "#c4a35a", // Fated Throne - golden
+  // Ruthless Boys Series
+  7772484327: "#1a1a2e", // Dark Fae - dark navy
+  7779097113: "#4a0e4e", // Savage Fae - purple
+  7797888957: "#8B0000", // Vicious Fae - crimson
+  7830749722: "#2d2d2d", // Broken Fae - charcoal
+  7830750304: "#3d1c02", // Warrior Fae - bronze
+  // Gods & Monsters Series
+  7406308212: "#0d1b2a", // The Book of Azrael - midnight
+  7484619744: "#c4a35a", // The Throne of Broken Gods - gold
+  7484619994: "#4a0e4e", // The Dawn of the Cursed Queen - purple
+  // Fanfic
+  60039506: "#1a1a1a", // Manacled - black
 };

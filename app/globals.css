@@ -95,37 +95,78 @@ body {
   letter-spacing: 0.05em;
 }
 
-/* Year Status Stamp */
-.year-status {
+/* Progress Bar */
+.progress-wrapper {
+  width: 60vw;
   margin-top: 4rem;
-  margin-bottom: 4rem;
-  padding: 2rem;
-  border: 1px solid #333;
-  display: inline-block;
-  transform: rotate(-2deg);
+  margin-bottom: 8rem;
+  padding: 0;
+  background: transparent;
 }
 
-.year-status h3 {
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-family: monospace;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.progress-track {
+  width: 100%;
+  height: 24px;
+  border: 1px solid #555;
+  padding: 2px;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: var(--accent-color);
+  width: 0%;
+  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0 10px rgba(204, 255, 0, 0.3);
+}
+
+/* Scanlines on the filled part */
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 5px,
+    rgba(0, 0, 0, 0.2) 5px,
+    rgba(0, 0, 0, 0.2) 10px
+  );
+}
+
+.status-text {
   font-weight: 900;
-  font-size: 2rem;
+  font-size: 1.5rem;
   text-transform: uppercase;
   color: #fff;
-}
-
-.year-status span {
-  font-family: monospace;
-  color: #888;
+  margin-top: 1rem;
+  letter-spacing: -0.02em;
 }
 
 /* Book Items */
 .book-item {
   line-height: 0.9;
   text-transform: uppercase;
-  white-space: nowrap;
   transition: color 0.3s ease, opacity 0.3s ease;
   user-select: none;
   will-change: transform, font-variation-settings;
   transform-origin: left center;
+  max-width: 85vw;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .is-hovering .book-item {
@@ -170,4 +211,310 @@ body {
   border-radius: 100px;
   margin-right: 10px;
   color: #888;
+}
+
+/* ==================== */
+/* NAVIGATION TABS      */
+/* ==================== */
+.nav-wrapper {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 60;
+  display: flex;
+  gap: 2rem;
+  mix-blend-mode: difference;
+}
+
+.nav-tab {
+  font-weight: 900;
+  font-size: 1rem;
+  color: #444;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+}
+
+.nav-tab:hover {
+  color: #fff;
+}
+
+.nav-tab.active {
+  color: var(--accent-color);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+/* ==================== */
+/* VIEW SECTIONS        */
+/* ==================== */
+.view-section {
+  display: none;
+  opacity: 0;
+  min-height: 100vh;
+  transition: opacity 0.3s ease;
+}
+
+.view-section.active {
+  display: block;
+  opacity: 1;
+}
+
+/* ==================== */
+/* ANALYTICS VIEW       */
+/* ==================== */
+#analytics-wrapper {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.analytics-section {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+  padding: 2rem;
+  border-bottom: 1px solid #111;
+}
+
+/* Stats Hero Styles */
+.stat-hero-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+  text-align: center;
+  z-index: 10;
+}
+
+.stat-hero-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-hero-val {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 900;
+  font-size: 8vw;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  color: #ffffff !important;
+}
+
+.stat-hero-val.accent {
+  color: transparent !important;
+  -webkit-text-stroke: 2px var(--accent-color);
+  text-stroke: 2px var(--accent-color);
+}
+
+.stat-hero-label {
+  font-family: monospace;
+  font-size: 1rem;
+  color: #666;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+/* Chart Container */
+.chart-fullscreen-container {
+  width: 80vw;
+  max-width: 1000px;
+  height: 60vh;
+  position: relative;
+  border: 1px solid #333;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.chart-fullscreen-header {
+  position: absolute;
+  top: -20px;
+  left: 2rem;
+  background: #050505;
+  padding: 0 1rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  border-left: 2px solid var(--accent-color);
+}
+
+/* ==================== */
+/* VISUALS VIEW         */
+/* ==================== */
+#visuals-wrapper {
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.visuals-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  padding-top: 4rem;
+}
+
+.visuals-title {
+  font-weight: 900;
+  font-size: 4rem;
+  color: #fff;
+  letter-spacing: -0.04em;
+  margin-bottom: 1rem;
+}
+
+.visuals-subtitle {
+  font-family: monospace;
+  color: #666;
+  font-size: 1rem;
+}
+
+/* The Tower */
+.tower-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-top: 2rem;
+  position: relative;
+}
+
+.tower-label {
+  position: absolute;
+  top: 0;
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: #666;
+}
+
+.tower-ruler {
+  position: absolute;
+  left: 2rem;
+  bottom: 0;
+  width: 60px;
+  border-right: 1px solid #333;
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: #444;
+}
+
+.ruler-tick {
+  position: absolute;
+  right: 0;
+  width: 10px;
+  height: 1px;
+  background: #333;
+}
+
+.ruler-label {
+  position: absolute;
+  right: 20px;
+  transform: translateY(-50%);
+}
+
+.tower-container {
+  width: 95vw;
+  max-width: 1600px;
+  display: flex;
+  flex-direction: column-reverse;
+  position: relative;
+  margin-left: 5rem;
+}
+
+/* TYPOGRAPHIC TEXTURE BLOCKS */
+.tower-block {
+  width: 100%;
+  margin-bottom: 4px;
+  position: relative;
+  white-space: pre-wrap;
+  overflow: hidden;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 12px;
+  letter-spacing: 0;
+  word-break: break-all;
+  padding-left: 20px;
+  color: #888;
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+
+/* Inline Title inside the block */
+.tower-title-inline {
+  color: var(--accent-color);
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-right: 10px;
+  letter-spacing: 0.05em;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Context Markers Container */
+#context-markers {
+  position: absolute;
+  right: 2rem;
+  bottom: 0;
+}
+
+/* Context Markers */
+.context-marker {
+  position: absolute;
+  right: 0;
+  width: 200px;
+  border-bottom: 1px dashed #444;
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: #666;
+  text-align: right;
+  padding-bottom: 0.2rem;
+}
+
+/* Tower Legend */
+.tower-legend {
+  margin-top: 4rem;
+  padding: 2rem;
+  border: 1px solid #333;
+  max-width: 1600px;
+  width: 95vw;
+}
+
+.legend-title {
+  font-weight: 900;
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.legend-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.legend-texture {
+  font-family: monospace;
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.legend-genre {
+  font-size: 0.8rem;
+  color: #888;
+  text-transform: uppercase;
 }
