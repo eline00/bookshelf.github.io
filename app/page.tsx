@@ -145,16 +145,22 @@ export default function Home() {
     }
   };
 
-  const getBookStyles = (book: Book) => {
-    const weight = Math.max(100, Math.min(900, (book.rating / 5) * 900));
+  const getBookStyles = (book: Book): React.CSSProperties => {
     const baseSize = Math.max(2.5, Math.min(7, (book.pages / 100) * 1.2));
     const titleLengthFactor =
       book.title.length > 30 ? 0.7 : book.title.length > 20 ? 0.85 : 1;
     const size = baseSize * titleLengthFactor;
     return {
-      fontWeight: weight,
+      fontWeight: 900, // Always bold for brutalist style
       fontSize: `clamp(1.5rem, ${size}vw, 6rem)`,
     };
+  };
+
+  const getRatingClass = (rating: number): string => {
+    if (rating >= 5) return "rating-5"; // Solid white
+    if (rating >= 4) return "rating-4"; // Solid gray
+    if (rating >= 3) return "rating-3"; // Hollow white outline
+    return "rating-low"; // Hollow gray outline
   };
 
   return (
@@ -237,6 +243,17 @@ export default function Home() {
               fillColor = "#ffee00";
             }
 
+            // Group books by month
+            const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+            const booksByMonth: Record<number, Book[]> = {};
+            yearBooks.forEach((book) => {
+              const monthIndex = new Date(book.date).getMonth();
+              if (!booksByMonth[monthIndex]) {
+                booksByMonth[monthIndex] = [];
+              }
+              booksByMonth[monthIndex].push(book);
+            });
+
             return (
               <div key={year}>
                 {/* Year Marker */}
@@ -247,19 +264,27 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Books */}
-                {yearBooks.map((book, index) => (
-                  <div
-                    key={`${book.id}-${index}`}
-                    className="book-item cursor-pointer"
-                    style={getBookStyles(book)}
-                    onMouseEnter={() => handleMouseEnter(book)}
-                    onMouseLeave={handleMouseLeave}
-                    onClick={() => openModal(book)}
-                  >
-                    {book.title}
-                  </div>
-                ))}
+                {/* Books grouped by month */}
+                {Object.keys(booksByMonth)
+                  .map(Number)
+                  .sort((a, b) => a - b)
+                  .map((monthIndex) => (
+                    <div key={monthIndex} className="month-group">
+                      <div className="month-marker">{monthNames[monthIndex]}</div>
+                      {booksByMonth[monthIndex].map((book, index) => (
+                        <div
+                          key={`${book.id}-${index}`}
+                          className={`book-item cursor-pointer ${getRatingClass(book.rating)}`}
+                          style={getBookStyles(book)}
+                          onMouseEnter={() => handleMouseEnter(book)}
+                          onMouseLeave={handleMouseLeave}
+                          onClick={() => openModal(book)}
+                        >
+                          {book.title}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
 
                 {/* Progress Bar */}
                 <div className="progress-wrapper">
