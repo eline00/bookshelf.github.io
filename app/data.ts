@@ -13,6 +13,10 @@ export interface Book {
   pages: number;
   genre: string;
   date: string;
+  dateStarted: string;
+  datePub: string;
+  readCount: number;
+  avgRating: number;
   notes: string;
 }
 
@@ -24,6 +28,7 @@ export const getBookCover = (book: Book): string => {
 };
 
 // Books extracted from Goodreads - organized by read date
+// Only books from "A Court of Thorns and Roses" onwards
 export const books: Book[] = [
   // 2024 Books
   {
@@ -35,6 +40,10 @@ export const books: Book[] = [
     pages: 419,
     genre: "Romantasy",
     date: "Oct 05, 2024",
+    dateStarted: "Sep 30, 2024",
+    datePub: "May 05, 2015",
+    readCount: 2,
+    avgRating: 4.16,
     notes: "None",
   },
   {
@@ -46,6 +55,10 @@ export const books: Book[] = [
     pages: 626,
     genre: "Romantasy",
     date: "Oct 10, 2024",
+    dateStarted: "Oct 05, 2024",
+    datePub: "May 03, 2016",
+    readCount: 2,
+    avgRating: 4.64,
     notes: "None",
   },
   {
@@ -57,6 +70,10 @@ export const books: Book[] = [
     pages: 699,
     genre: "Romantasy",
     date: "Oct 14, 2024",
+    dateStarted: "Oct 09, 2024",
+    datePub: "May 02, 2017",
+    readCount: 1,
+    avgRating: 4.46,
     notes: "None",
   },
   {
@@ -68,6 +85,10 @@ export const books: Book[] = [
     pages: 272,
     genre: "Romantasy",
     date: "Oct 16, 2024",
+    dateStarted: "Oct 14, 2024",
+    datePub: "May 21, 2019",
+    readCount: 1,
+    avgRating: 3.72,
     notes: "None",
   },
   {
@@ -79,6 +100,10 @@ export const books: Book[] = [
     pages: 757,
     genre: "Romantasy",
     date: "Oct 18, 2024",
+    dateStarted: "Oct 16, 2024",
+    datePub: "Feb 16, 2021",
+    readCount: 1,
+    avgRating: 4.45,
     notes: "None",
   },
   {
@@ -90,6 +115,10 @@ export const books: Book[] = [
     pages: 517,
     genre: "Romantasy",
     date: "Oct 20, 2024",
+    dateStarted: "Oct 18, 2024",
+    datePub: "May 02, 2023",
+    readCount: 2,
+    avgRating: 4.57,
     notes: "None",
   },
   {
@@ -101,6 +130,10 @@ export const books: Book[] = [
     pages: 623,
     genre: "Romantasy",
     date: "Oct 31, 2024",
+    dateStarted: "Oct 21, 2024",
+    datePub: "Nov 07, 2023",
+    readCount: 2,
+    avgRating: 4.35,
     notes: "None",
   },
   {
@@ -112,6 +145,10 @@ export const books: Book[] = [
     pages: 406,
     genre: "Fantasy",
     date: "Nov 10, 2024",
+    dateStarted: "Nov 03, 2024",
+    datePub: "Aug 07, 2012",
+    readCount: 1,
+    avgRating: 4.18,
     notes: "None",
   },
   {
@@ -123,6 +160,10 @@ export const books: Book[] = [
     pages: 420,
     genre: "Fantasy",
     date: "Nov 14, 2024",
+    dateStarted: "Nov 10, 2024",
+    datePub: "Aug 15, 2013",
+    readCount: 1,
+    avgRating: 4.36,
     notes: "None",
   },
   {
@@ -134,6 +175,10 @@ export const books: Book[] = [
     pages: 576,
     genre: "Fantasy",
     date: "Nov 18, 2024",
+    dateStarted: "Nov 14, 2024",
+    datePub: "Sep 02, 2014",
+    readCount: 1,
+    avgRating: 4.45,
     notes: "None",
   },
   {
@@ -145,6 +190,10 @@ export const books: Book[] = [
     pages: 451,
     genre: "Fantasy",
     date: "Nov 21, 2024",
+    dateStarted: "Nov 18, 2024",
+    datePub: "Mar 04, 2014",
+    readCount: 1,
+    avgRating: 4.20,
     notes: "None",
   },
   {
@@ -156,6 +205,10 @@ export const books: Book[] = [
     pages: 648,
     genre: "Fantasy",
     date: "Nov 25, 2024",
+    dateStarted: "Nov 21, 2024",
+    datePub: "Sep 01, 2015",
+    readCount: 1,
+    avgRating: 4.62,
     notes: "None",
   },
   {
@@ -167,6 +220,10 @@ export const books: Book[] = [
     pages: 733,
     genre: "Fantasy",
     date: "Nov 30, 2024",
+    dateStarted: "Nov 25, 2024",
+    datePub: "Sep 06, 2016",
+    readCount: 1,
+    avgRating: 4.63,
     notes: "None",
   },
   {
@@ -178,6 +235,10 @@ export const books: Book[] = [
     pages: 688,
     genre: "Fantasy",
     date: "Nov 30, 2024",
+    dateStarted: "Nov 25, 2024",
+    datePub: "Sep 05, 2017",
+    readCount: 1,
+    avgRating: 4.28,
     notes: "None",
   },
   {
@@ -189,6 +250,10 @@ export const books: Book[] = [
     pages: 984,
     genre: "Fantasy",
     date: "Dec 05, 2024",
+    dateStarted: "Nov 30, 2024",
+    datePub: "Oct 23, 2018",
+    readCount: 1,
+    avgRating: 4.71,
     notes: "None",
   },
   {
@@ -200,6 +265,10 @@ export const books: Book[] = [
     pages: 624,
     genre: "Romantasy",
     date: "Dec 26, 2024",
+    dateStarted: "Dec 22, 2024",
+    datePub: "Jun 04, 2024",
+    readCount: 1,
+    avgRating: 4.34,
     notes: "None",
   },
 
@@ -213,6 +282,10 @@ export const books: Book[] = [
     pages: 803,
     genre: "Romantasy",
     date: "Jan 07, 2025",
+    dateStarted: "Dec 27, 2024",
+    datePub: "Mar 03, 2020",
+    readCount: 1,
+    avgRating: 4.25,
     notes: "None",
   },
   {
@@ -224,6 +297,10 @@ export const books: Book[] = [
     pages: 805,
     genre: "Romantasy",
     date: "Jan 15, 2025",
+    dateStarted: "Jan 07, 2025",
+    datePub: "Feb 15, 2022",
+    readCount: 1,
+    avgRating: 4.31,
     notes: "None",
   },
   {
@@ -235,10 +312,14 @@ export const books: Book[] = [
     pages: 835,
     genre: "Romantasy",
     date: "Jan 26, 2025",
+    dateStarted: "Jan 15, 2025",
+    datePub: "Jan 30, 2024",
+    readCount: 1,
+    avgRating: 4.18,
     notes: "None",
   },
   {
-    id: 61431922,
+    id: 61431923,
     title: "Fourth Wing",
     author: "Rebecca Yarros",
     year: 2025,
@@ -246,10 +327,14 @@ export const books: Book[] = [
     pages: 517,
     genre: "Romantasy",
     date: "Feb 01, 2025",
+    dateStarted: "Jan 26, 2025",
+    datePub: "May 02, 2023",
+    readCount: 2,
+    avgRating: 4.57,
     notes: "Re-read",
   },
   {
-    id: 202533930,
+    id: 202533931,
     title: "Iron Flame",
     author: "Rebecca Yarros",
     year: 2025,
@@ -257,6 +342,10 @@ export const books: Book[] = [
     pages: 623,
     genre: "Romantasy",
     date: "Feb 10, 2025",
+    dateStarted: "Feb 01, 2025",
+    datePub: "Nov 07, 2023",
+    readCount: 2,
+    avgRating: 4.35,
     notes: "Re-read",
   },
   {
@@ -268,6 +357,10 @@ export const books: Book[] = [
     pages: 544,
     genre: "Romantasy",
     date: "Feb 18, 2025",
+    dateStarted: "Feb 10, 2025",
+    datePub: "Jan 21, 2025",
+    readCount: 1,
+    avgRating: 4.21,
     notes: "None",
   },
   {
@@ -279,6 +372,10 @@ export const books: Book[] = [
     pages: 718,
     genre: "Romantasy",
     date: "Mar 06, 2025",
+    dateStarted: "Feb 19, 2025",
+    datePub: "Nov 24, 2024",
+    readCount: 1,
+    avgRating: 3.99,
     notes: "None",
   },
   {
@@ -290,6 +387,10 @@ export const books: Book[] = [
     pages: 945,
     genre: "Fanfic",
     date: "Mar 15, 2025",
+    dateStarted: "Mar 04, 2025",
+    datePub: "Aug 19, 2019",
+    readCount: 2,
+    avgRating: 4.63,
     notes: "Re-read",
   },
   {
@@ -301,6 +402,10 @@ export const books: Book[] = [
     pages: 432,
     genre: "Romantasy",
     date: "Mar 18, 2025",
+    dateStarted: "Mar 16, 2025",
+    datePub: "Sep 27, 2022",
+    readCount: 1,
+    avgRating: 4.27,
     notes: "None",
   },
   {
@@ -312,6 +417,10 @@ export const books: Book[] = [
     pages: 437,
     genre: "Romantasy",
     date: "Mar 23, 2025",
+    dateStarted: "Mar 19, 2025",
+    datePub: "Oct 17, 2023",
+    readCount: 1,
+    avgRating: 4.39,
     notes: "None",
   },
   {
@@ -323,6 +432,10 @@ export const books: Book[] = [
     pages: 583,
     genre: "Dark Romance",
     date: "Mar 28, 2025",
+    dateStarted: "Mar 23, 2025",
+    datePub: "Aug 12, 2021",
+    readCount: 1,
+    avgRating: 3.94,
     notes: "None",
   },
   {
@@ -334,6 +447,10 @@ export const books: Book[] = [
     pages: 684,
     genre: "Dark Romance",
     date: "Apr 09, 2025",
+    dateStarted: "Mar 28, 2025",
+    datePub: "Jan 25, 2022",
+    readCount: 1,
+    avgRating: 4.07,
     notes: "None",
   },
   {
@@ -345,6 +462,10 @@ export const books: Book[] = [
     pages: 504,
     genre: "Romantasy",
     date: "Apr 12, 2025",
+    dateStarted: "Apr 10, 2025",
+    datePub: "Aug 16, 2022",
+    readCount: 1,
+    avgRating: 4.27,
     notes: "None",
   },
   {
@@ -356,6 +477,10 @@ export const books: Book[] = [
     pages: 737,
     genre: "Romantasy",
     date: "Apr 25, 2025",
+    dateStarted: "Apr 13, 2025",
+    datePub: "Apr 14, 2023",
+    readCount: 1,
+    avgRating: 4.07,
     notes: "None",
   },
   {
@@ -367,6 +492,10 @@ export const books: Book[] = [
     pages: 572,
     genre: "Romantasy",
     date: "May 01, 2025",
+    dateStarted: "Apr 26, 2025",
+    datePub: "Apr 26, 2022",
+    readCount: 1,
+    avgRating: 4.12,
     notes: "None",
   },
   {
@@ -378,6 +507,10 @@ export const books: Book[] = [
     pages: 728,
     genre: "Romantasy",
     date: "May 08, 2025",
+    dateStarted: "May 01, 2025",
+    datePub: "May 18, 2023",
+    readCount: 1,
+    avgRating: 4.21,
     notes: "None",
   },
   {
@@ -389,6 +522,10 @@ export const books: Book[] = [
     pages: 581,
     genre: "Romantasy",
     date: "May 21, 2025",
+    dateStarted: "May 10, 2025",
+    datePub: "May 28, 2024",
+    readCount: 1,
+    avgRating: 4.32,
     notes: "None",
   },
   {
@@ -400,10 +537,14 @@ export const books: Book[] = [
     pages: 141,
     genre: "Fiction",
     date: "Jun 03, 2025",
+    dateStarted: "Jun 01, 2025",
+    datePub: "Aug 17, 1945",
+    readCount: 1,
+    avgRating: 4.01,
     notes: "None",
   },
   {
-    id: 6942919341,
+    id: 6942919342,
     title: "A Court of Thorns and Roses",
     author: "Sarah J. Maas",
     year: 2025,
@@ -411,10 +552,14 @@ export const books: Book[] = [
     pages: 419,
     genre: "Romantasy",
     date: "Jun 24, 2025",
-    notes: "None",
+    dateStarted: "Jun 22, 2025",
+    datePub: "May 05, 2015",
+    readCount: 2,
+    avgRating: 4.16,
+    notes: "Re-read",
   },
   {
-    id: 6942935033,
+    id: 6942935034,
     title: "A Court of Mist and Fury",
     author: "Sarah J. Maas",
     year: 2025,
@@ -422,7 +567,11 @@ export const books: Book[] = [
     pages: 626,
     genre: "Romantasy",
     date: "Jun 30, 2025",
-    notes: "None",
+    dateStarted: "Jun 25, 2025",
+    datePub: "May 03, 2016",
+    readCount: 2,
+    avgRating: 4.64,
+    notes: "Re-read",
   },
   {
     id: 7406314349,
@@ -433,6 +582,10 @@ export const books: Book[] = [
     pages: 319,
     genre: "Fiction",
     date: "Jul 04, 2025",
+    dateStarted: "Jul 01, 2025",
+    datePub: "May 16, 2023",
+    readCount: 1,
+    avgRating: 3.93,
     notes: "None",
   },
   {
@@ -444,6 +597,10 @@ export const books: Book[] = [
     pages: 406,
     genre: "Romantasy",
     date: "Jul 10, 2025",
+    dateStarted: "Jul 05, 2025",
+    datePub: "Apr 30, 2024",
+    readCount: 1,
+    avgRating: 4.15,
     notes: "None",
   },
   {
@@ -455,6 +612,10 @@ export const books: Book[] = [
     pages: 464,
     genre: "Romantasy",
     date: "Jul 12, 2025",
+    dateStarted: "Jul 10, 2025",
+    datePub: "Feb 04, 2025",
+    readCount: 1,
+    avgRating: 4.42,
     notes: "None",
   },
   {
@@ -466,6 +627,10 @@ export const books: Book[] = [
     pages: 436,
     genre: "Romantasy",
     date: "Jul 15, 2025",
+    dateStarted: "Jul 12, 2025",
+    datePub: "Aug 14, 2019",
+    readCount: 1,
+    avgRating: 4.02,
     notes: "None",
   },
   {
@@ -477,6 +642,10 @@ export const books: Book[] = [
     pages: 475,
     genre: "Romantasy",
     date: "Jul 20, 2025",
+    dateStarted: "Jul 15, 2025",
+    datePub: "Oct 31, 2019",
+    readCount: 1,
+    avgRating: 4.15,
     notes: "None",
   },
   {
@@ -488,6 +657,10 @@ export const books: Book[] = [
     pages: 562,
     genre: "Romantasy",
     date: "Jul 25, 2025",
+    dateStarted: "Jul 20, 2025",
+    datePub: "Jan 28, 2020",
+    readCount: 1,
+    avgRating: 4.22,
     notes: "None",
   },
   {
@@ -499,6 +672,10 @@ export const books: Book[] = [
     pages: 536,
     genre: "Romantasy",
     date: "Jul 28, 2025",
+    dateStarted: "Jul 25, 2025",
+    datePub: "Nov 30, 2019",
+    readCount: 1,
+    avgRating: 4.21,
     notes: "None",
   },
   {
@@ -510,6 +687,10 @@ export const books: Book[] = [
     pages: 513,
     genre: "Romantasy",
     date: "Jul 28, 2025",
+    dateStarted: "Jul 28, 2025",
+    datePub: "Jan 31, 2020",
+    readCount: 1,
+    avgRating: 4.18,
     notes: "None",
   },
   {
@@ -521,6 +702,10 @@ export const books: Book[] = [
     pages: 678,
     genre: "Romantasy",
     date: "Aug 05, 2025",
+    dateStarted: "Jul 28, 2025",
+    datePub: "Feb 21, 2020",
+    readCount: 1,
+    avgRating: 4.22,
     notes: "None",
   },
   {
@@ -532,6 +717,10 @@ export const books: Book[] = [
     pages: 664,
     genre: "Romantasy",
     date: "Aug 14, 2025",
+    dateStarted: "Aug 04, 2025",
+    datePub: "Aug 31, 2020",
+    readCount: 1,
+    avgRating: 4.27,
     notes: "None",
   },
   {
@@ -543,6 +732,10 @@ export const books: Book[] = [
     pages: 680,
     genre: "Romantasy",
     date: "Sep 19, 2025",
+    dateStarted: "Aug 14, 2025",
+    datePub: "Apr 30, 2021",
+    readCount: 1,
+    avgRating: 4.28,
     notes: "None",
   },
   {
@@ -554,6 +747,10 @@ export const books: Book[] = [
     pages: 724,
     genre: "Romantasy",
     date: "Sep 24, 2025",
+    dateStarted: "Sep 20, 2025",
+    datePub: "Jan 13, 2020",
+    readCount: 1,
+    avgRating: 4.27,
     notes: "None",
   },
   {
@@ -565,6 +762,10 @@ export const books: Book[] = [
     pages: 886,
     genre: "Romantasy",
     date: "Sep 28, 2025",
+    dateStarted: "Sep 24, 2025",
+    datePub: "Dec 21, 2020",
+    readCount: 1,
+    avgRating: 4.31,
     notes: "None",
   },
   {
@@ -576,6 +777,10 @@ export const books: Book[] = [
     pages: 823,
     genre: "Romantasy",
     date: "Oct 07, 2025",
+    dateStarted: "Sep 28, 2025",
+    datePub: "Dec 25, 2020",
+    readCount: 1,
+    avgRating: 4.32,
     notes: "None",
   },
 ];
@@ -597,13 +802,17 @@ export const genreGradients: Record<string, string> = {
 export const bookCoverColors: Record<number, string> = {
   // ACOTAR Series - deep reds and blacks
   6942919341: "#8B0000", // A Court of Thorns and Roses - dark red
+  6942919342: "#8B0000", // A Court of Thorns and Roses (re-read)
   6942935033: "#1a1a3e", // A Court of Mist and Fury - deep blue/purple
+  6942935034: "#1a1a3e", // A Court of Mist and Fury (re-read)
   50659472: "#8B4513", // A Court of Wings and Ruin - bronze/brown
   50659471: "#2F4F4F", // A Court of Frost and Starlight - dark slate
   53138095: "#800020", // A Court of Silver Flames - burgundy
   // Empyrean Series - blacks and golds
   61431922: "#1a1a1a", // Fourth Wing - black with gold accents
+  61431923: "#1a1a1a", // Fourth Wing (re-read)
   202533930: "#8B4513", // Iron Flame - copper/bronze
+  202533931: "#8B4513", // Iron Flame (re-read)
   209439446: "#0a0a0a", // Onyx Storm - deep black
   // Throne of Glass Series - greens and golds
   76703559: "#2d5a27", // Throne of Glass - forest green

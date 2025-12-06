@@ -40,5 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# ignore duplicate node_modules
-node_modules 2/
+# source data
+source.txt
