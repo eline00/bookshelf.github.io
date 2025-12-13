@@ -8,7 +8,7 @@ const TimelineView = lazy(() => import("./components/TimelineView"));
 const AnalyticsView = lazy(() => import("./components/AnalyticsView"));
 const VisualsView = lazy(() => import("./components/VisualsView"));
 
-type ViewType = "timeline" | "stats" | "page tower";
+type ViewType = "timeline" | "analytics" | "visuals";
 
 export default function Home() {
   const [activeView, setActiveView] = useState<ViewType>("timeline");
@@ -40,16 +40,16 @@ export default function Home() {
           Timeline
         </button>
         <button
-          className={`nav-tab ${activeView === "stats" ? "active" : ""}`}
-          onClick={() => switchView("stats")}
+          className={`nav-tab ${activeView === "analytics" ? "active" : ""}`}
+          onClick={() => switchView("analytics")}
         >
-          Stats
+          ANALYTICS
         </button>
         <button
-          className={`nav-tab ${activeView === "page tower" ? "active" : ""}`}
-          onClick={() => switchView("page tower")}
+          className={`nav-tab ${activeView === "visuals" ? "active" : ""}`}
+          onClick={() => switchView("visuals")}
         >
-          Page Tower
+          VISUALS
         </button>
       </nav>
 
@@ -69,7 +69,9 @@ export default function Home() {
       </div>
 
       {/* VIEW 2: STATS */}
-      <div className={`view-section ${activeView === "stats" ? "active" : ""}`}>
+      <div
+        className={`view-section ${activeView === "analytics" ? "active" : ""}`}
+      >
         <Suspense
           fallback={
             <div className="flex items-center justify-center min-h-screen">
@@ -77,13 +79,13 @@ export default function Home() {
             </div>
           }
         >
-          {activeView === "stats" && <AnalyticsView />}
+          {activeView === "analytics" && <AnalyticsView />}
         </Suspense>
       </div>
 
       {/* VIEW 3: PAGE TOWER */}
       <div
-        className={`view-section ${activeView === "page tower" ? "active" : ""}`}
+        className={`view-section ${activeView === "visuals" ? "active" : ""}`}
       >
         <Suspense
           fallback={
@@ -92,7 +94,7 @@ export default function Home() {
             </div>
           }
         >
-          {activeView === "page tower" && <VisualsView />}
+          {activeView === "visuals" && <VisualsView />}
         </Suspense>
       </div>
     </>

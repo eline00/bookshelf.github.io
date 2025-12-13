@@ -27,6 +27,175 @@ export const getBookCover = (book: Book): string => {
   return `/covers/${book.id}.jpg`;
 };
 
+// Generate Spotify daylist-style book description
+// Mixes vibes, moods, and themes based on book attributes
+export const getBookVibe = (book: Book): string => {
+  // Seed random based on book id for consistency
+  const seededRandom = (seed: number, index: number) => {
+    const x = Math.sin(seed + index * 9999) * 10000;
+    return x - Math.floor(x);
+  };
+
+  // Vibe words by genre
+  const genreVibes: Record<string, string[]> = {
+    Romantasy: [
+      "fae courts",
+      "starlit nights",
+      "morally grey",
+      "enemies to lovers",
+      "forbidden magic",
+      "midnight trysts",
+      "cursed hearts",
+      "velvet darkness",
+      "throne room tension",
+      "wings unfurling",
+      "mate bonds",
+      "ancient power",
+    ],
+    Fantasy: [
+      "epic battles",
+      "kingdom rising",
+      "blood oath",
+      "shadow realm",
+      "fire and ruin",
+      "crown heavy",
+      "war drums",
+      "ancient prophecy",
+      "sword and sorcery",
+      "chosen one",
+      "dark magic",
+      "rebellion brewing",
+    ],
+    "Dark Romance": [
+      "obsessive",
+      "dangerous",
+      "possessive",
+      "morally corrupt",
+      "twisted devotion",
+      "shadow stalker",
+      "dark desire",
+      "unhinged",
+      "toxic allure",
+      "no boundaries",
+    ],
+    Fanfic: [
+      "what if",
+      "alternate universe",
+      "slow burn",
+      "comfort read",
+      "emotional damage",
+      "found family",
+      "angst central",
+      "fix-it fic",
+    ],
+    Fiction: [
+      "thought-provoking",
+      "society mirror",
+      "human nature",
+      "timeless",
+      "literary",
+      "contemplative",
+      "layered meaning",
+      "classic energy",
+    ],
+  };
+
+  // Mood words based on rating
+  const ratingMoods: Record<number, string[]> = {
+    5: [
+      "obsessed",
+      "unputdownable",
+      "all-consuming",
+      "peak fiction",
+      "chef's kiss",
+      "no thoughts just vibes",
+      "core memory",
+      "living in my head",
+    ],
+    4: [
+      "thoroughly enjoyed",
+      "would recommend",
+      "solid choice",
+      "satisfying",
+      "well spent time",
+      "good decisions only",
+    ],
+    3: [
+      "mixed feelings",
+      "it was fine",
+      "mid but make it fashion",
+      "situational",
+      "had its moments",
+      "complicated relationship",
+    ],
+    2: [
+      "struggled through",
+      "not for me",
+      "questionable choices",
+      "regrettable",
+      "confusion",
+      "why did I",
+    ],
+    1: ["pain", "suffering", "mistakes were made", "never again", "chaos"],
+  };
+
+  // Pace words based on pages
+  const paceWords =
+    book.pages > 700
+      ? ["marathon read", "epic length", "commitment era", "long haul", "tome energy"]
+      : book.pages > 500
+        ? ["substantial", "meaty", "chunky", "deep dive"]
+        : book.pages > 300
+          ? ["perfect length", "balanced", "just right", "sweet spot"]
+          : ["quick bite", "fast consume", "sprint read", "binge ready"];
+
+  // Time of day vibes based on reading speed
+  const startDate = new Date(book.dateStarted);
+  const endDate = new Date(book.date);
+  const daysToRead = Math.max(
+    1,
+    Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+  );
+  const pagesPerDay = book.pages / daysToRead;
+
+  const speedVibes =
+    pagesPerDay > 200
+      ? ["speed demon", "hyperfocus", "consumed whole", "possessed reading"]
+      : pagesPerDay > 100
+        ? ["steady pace", "dedicated hours", "cozy sessions"]
+        : ["savored slowly", "taking my time", "prolonged enjoyment"];
+
+  // Re-read indicator
+  const rereadVibes =
+    book.readCount > 1
+      ? ["comfort reread", "returning home", "familiar embrace", "nostalgia hit"]
+      : [];
+
+  // Build the vibe string
+  const genre = book.genre || "Fiction";
+  const genrePool = genreVibes[genre] || genreVibes["Fiction"];
+
+  // Pick words using seeded random for consistency
+  const pick = (arr: string[], index: number) =>
+    arr[Math.floor(seededRandom(book.id, index) * arr.length)];
+
+  const parts = [
+    pick(genrePool, 0),
+    pick(ratingMoods[book.rating] || ratingMoods[3], 1),
+    pick(paceWords, 2),
+    pick(speedVibes, 3),
+  ];
+
+  // Add re-read vibe if applicable
+  if (rereadVibes.length > 0) {
+    parts.push(pick(rereadVibes, 4));
+  } else {
+    parts.push(pick(genrePool, 5));
+  }
+
+  return parts.join(" // ");
+};
+
 // Books extracted from Goodreads - organized by read date
 // Only books from "A Court of Thorns and Roses" onwards
 export const books: Book[] = [
