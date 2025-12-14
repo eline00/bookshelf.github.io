@@ -22,9 +22,12 @@ export interface Book {
 
 // Helper function to get cover image URL
 // Uses local images stored in /public/covers/
+// Includes basePath for GitHub Pages deployment
+const basePath = process.env.NODE_ENV === 'production' ? '/bookshelf.github.io' : '';
+
 export const getBookCover = (book: Book): string => {
   // All covers are stored locally by book ID
-  return `/covers/${book.id}.jpg`;
+  return `${basePath}/covers/${book.id}.jpg`;
 };
 
 // Generate Spotify daylist-style book description
