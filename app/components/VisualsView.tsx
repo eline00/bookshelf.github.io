@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { gsap } from "gsap";
 import { books } from "../data";
 
-type ViewMode = "tower" | "tree" | "shelf";
+type ViewMode = "tower" | "tree" | "shelf" | "scroll";
 
 // Genre-based typographic textures (text characters only)
 const genreTextures: Record<string, string> = {
@@ -35,17 +35,19 @@ function generateTreeLines(): { line: string; isLeaves: boolean }[] {
 
   // Create a more realistic pine tree with multiple tiers
   const tiers = [
-    { startWidth: 2, endWidth: 14, rows: 6 },   // Top tier (smallest)
-    { startWidth: 8, endWidth: 22, rows: 7 },   // Second tier
-    { startWidth: 14, endWidth: 32, rows: 8 },  // Third tier
-    { startWidth: 20, endWidth: 44, rows: 9 },  // Bottom tier (largest)
+    { startWidth: 2, endWidth: 14, rows: 6 }, // Top tier (smallest)
+    { startWidth: 8, endWidth: 22, rows: 7 }, // Second tier
+    { startWidth: 14, endWidth: 32, rows: 8 }, // Third tier
+    { startWidth: 20, endWidth: 44, rows: 9 }, // Bottom tier (largest)
   ];
 
   // Generate crown tiers
   for (const tier of tiers) {
     for (let row = 0; row < tier.rows; row++) {
       const progress = row / (tier.rows - 1);
-      const width = Math.floor(tier.startWidth + (tier.endWidth - tier.startWidth) * progress);
+      const width = Math.floor(
+        tier.startWidth + (tier.endWidth - tier.startWidth) * progress
+      );
       const padding = Math.floor((maxWidth - width) / 2);
 
       let line = " ".repeat(padding);
@@ -74,10 +76,10 @@ function generateTreeLines(): { line: string; isLeaves: boolean }[] {
 // Generate tree data structure for rendering with fill percentage
 // Fill from bottom to top (tree grows from ground up)
 function generateTreeData(fillPercent: number = 1): {
-  lines: { line: string; isLeaves: boolean; isFilled: boolean }[]
+  lines: { line: string; isLeaves: boolean; isFilled: boolean }[];
 } {
   const baseLines = generateTreeLines();
-  const totalLeafLines = baseLines.filter(l => l.isLeaves).length;
+  const totalLeafLines = baseLines.filter((l) => l.isLeaves).length;
   const filledLeafLines = Math.floor(totalLeafLines * fillPercent);
 
   // Count leaf lines from bottom to fill from bottom up
@@ -127,37 +129,42 @@ function generateBookData() {
 }
 
 // View mode descriptions for context
-const viewDescriptions: Record<ViewMode, { title: string; subtitle: string }> = {
-  tower: {
-    title: "PAGE TOWER",
-    subtitle: "Each book's height = its page count",
-  },
-  tree: {
-    title: "PAPER FOREST",
-    subtitle: "Your pages consumed as trees of paper",
-  },
-  shelf: {
-    title: "BOOKSHELF",
-    subtitle: "Books arranged by author, width = page count",
-  },
-};
+const viewDescriptions: Record<ViewMode, { title: string; subtitle: string }> =
+  {
+    tower: {
+      title: "BOOK STACK",
+      subtitle: "Books stacked by read order, spine thickness = pages",
+    },
+    tree: {
+      title: "PAPER FOREST",
+      subtitle: "Your pages consumed as trees of paper",
+    },
+    shelf: {
+      title: "BOOKSHELF",
+      subtitle: "Books arranged by author, width = page count",
+    },
+    scroll: {
+      title: "SCROLL",
+      subtitle: "All the pages as one continuous paper scroll",
+    },
+  };
 
 export default function VisualsView() {
   const [viewMode, setViewMode] = useState<ViewMode>("tower");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [particlesInitialized, setParticlesInitialized] = useState(false);
   const [shelfStyleActive, setShelfStyleActive] = useState(false);
+  const [towerStyleActive, setTowerStyleActive] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const particleRefs = useRef<(HTMLDivElement | null)[]>([]);
   const treeContainerRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollAnimationRef = useRef<gsap.core.Tween | null>(null);
 
   const totalPages = books.reduce((sum, b) => sum + b.pages, 0);
 
   // Pre-generate book data
   const bookData = useMemo(() => generateBookData(), []);
-
-  // Pixels per page for tower height calculation
-  const PX_PER_PAGE = 0.8;
 
   // Calculate interesting comparisons
   const comparisons = useMemo(() => {
@@ -172,13 +179,56 @@ export default function VisualsView() {
     // Stacked paper height (0.1mm per page = 0.0001m)
     const stackedMeters = totalPagesNum * 0.0001;
 
+    // Scroll length: standard page is ~28cm tall (A4/Letter size)
+    // All pages attached = totalPages * 0.28m
+    const scrollLengthMeters = totalPagesNum * 0.28;
+    const scrollLengthKm = scrollLengthMeters / 1000;
+
+    // Fun comparisons for scroll length
+    const titanics = scrollLengthMeters / 269; // Titanic = 269m
+    const statuesOfLiberty = scrollLengthMeters / 93; // Statue of Liberty = 93m (to torch)
+    const eiffelTowers = scrollLengthMeters / 330; // Eiffel Tower = 330m
+
     return {
       totalPages: totalPagesNum,
       totalWords,
       treesWorth,
       stackedMeters,
+      scrollLengthMeters,
+      scrollLengthKm,
+      titanics,
+      statuesOfLiberty,
+      eiffelTowers,
     };
   }, []);
+
+  // Generate scroll segments with distance markers every 100m
+  const scrollSegments = useMemo(() => {
+    const METERS_PER_PAGE = 0.28;
+    const MARKER_INTERVAL = 100; // meters
+    const segments: Array<
+      | { type: "book"; book: (typeof bookData)[0] }
+      | { type: "marker"; distance: number }
+    > = [];
+
+    let cumulativeMeters = 0;
+    let nextMarkerAt = MARKER_INTERVAL;
+
+    bookData.forEach((book) => {
+      const bookMeters = book.pages * METERS_PER_PAGE;
+
+      // Check if we need to insert marker(s) before or during this book
+      while (cumulativeMeters + bookMeters >= nextMarkerAt) {
+        segments.push({ type: "marker", distance: nextMarkerAt });
+        nextMarkerAt += MARKER_INTERVAL;
+      }
+
+      segments.push({ type: "book", book });
+      cumulativeMeters += bookMeters;
+    });
+
+    return segments;
+  }, [bookData]);
 
   // Generate tree data for the forest view
   const treeData = useMemo(() => {
@@ -188,7 +238,7 @@ export default function VisualsView() {
     const trees: {
       lines: { line: string; isLeaves: boolean; isFilled: boolean }[];
       isFull: boolean;
-      percent: number
+      percent: number;
     }[] = [];
 
     // Generate full trees
@@ -241,26 +291,34 @@ export default function VisualsView() {
     const positions: LayoutPosition[] = [];
 
     if (mode === "tower") {
-      // TOWER: Stack vertically, height = pages
+      // TOWER: Books stacked like a pile, spine facing front
+      // Height (spine thickness) based on page count
+      const bookWidth = Math.min(500, containerWidth - 80); // Fixed width for all books
       let currentY = 0;
-      const blockWidth = Math.min(800, containerWidth - 40);
 
-      bookData.forEach((book, i) => {
-        const h = book.pages * PX_PER_PAGE;
+      // Stack from bottom to top (reverse order so newest on top)
+      const reversedBooks = [...bookData].reverse();
+
+      reversedBooks.forEach((book, i) => {
+        // Spine thickness: min 12px, max 40px based on pages
+        const spineHeight = Math.max(12, Math.min(40, book.pages * 0.06));
 
         positions.push({
-          width: blockWidth,
-          height: h,
-          x: centerX - blockWidth / 2,
+          width: bookWidth,
+          height: spineHeight,
+          x: centerX - bookWidth / 2,
           y: currentY,
           rotation: 0,
-          fontSize: "12px",
-          paddingLeft: "20px",
+          fontSize: "11px",
+          paddingLeft: "16px",
           zIndex: bookData.length - i,
         });
 
-        currentY += h;
+        currentY += spineHeight;
       });
+
+      // Reverse positions to match original bookData order
+      positions.reverse();
     } else if (mode === "tree") {
       // TREE: Hide particles (fade out) and show ASCII tree overlay instead
       // Particles collapse to center and fade out
@@ -287,7 +345,10 @@ export default function VisualsView() {
       const gap = 3;
 
       // Create a mapping from original index to shelf position
-      const shelfPositions: Map<number, { x: number; y: number; width: number }> = new Map();
+      const shelfPositions: Map<
+        number,
+        { x: number; y: number; width: number }
+      > = new Map();
 
       let currentX = 0;
       let currentShelf = 0;
@@ -337,6 +398,22 @@ export default function VisualsView() {
           });
         }
       });
+    } else if (mode === "scroll") {
+      // SCROLL: Hide particles and show scroll overlay instead
+      bookData.forEach((_, index) => {
+        positions[index] = {
+          width: 5,
+          height: 5,
+          x: centerX - 2.5,
+          y: 300,
+          rotation: 0,
+          fontSize: "0px",
+          paddingLeft: "0px",
+          zIndex: 0,
+          borderRadius: "50%",
+          opacity: 0,
+        };
+      });
     }
 
     return positions;
@@ -345,7 +422,11 @@ export default function VisualsView() {
   // Get container height based on layout
   const getContainerHeight = (mode: ViewMode): number => {
     if (mode === "tower") {
-      return bookData.reduce((sum, b) => sum + b.pages * PX_PER_PAGE, 0) + 200;
+      // Calculate total height based on spine thicknesses
+      const totalSpineHeight = bookData.reduce((sum, b) => {
+        return sum + Math.max(12, Math.min(40, b.pages * 0.06));
+      }, 0);
+      return totalSpineHeight + 100;
     } else if (mode === "tree") {
       return 650; // Crown height (450) + trunk (80) + padding
     } else if (mode === "shelf") {
@@ -365,8 +446,32 @@ export default function VisualsView() {
       });
 
       return shelfCount * 240 + 200;
+    } else if (mode === "scroll") {
+      return 1400; // Fixed height for scroll visualization with comparison cards
     }
     return 1200;
+  };
+
+  // Start the continuous scroll animation
+  const startScrollAnimation = () => {
+    const scrollRibbon = document.querySelector(
+      ".scroll-ribbon"
+    ) as HTMLElement;
+    if (!scrollRibbon) return;
+
+    // Reset position
+    gsap.set(scrollRibbon, { x: 0 });
+
+    // Calculate the width of one segment (half of total since we duplicate)
+    const segmentWidth = scrollRibbon.scrollWidth / 2;
+
+    // Create infinite scroll animation
+    scrollAnimationRef.current = gsap.to(scrollRibbon, {
+      x: -segmentWidth,
+      duration: 60, // Slow, hypnotic scroll
+      ease: "none",
+      repeat: -1,
+    });
   };
 
   // Animate to new layout
@@ -376,6 +481,7 @@ export default function VisualsView() {
     setIsTransitioning(true);
     // Immediately remove special styling when leaving current view
     setShelfStyleActive(false);
+    setTowerStyleActive(false);
     setViewMode(newMode);
 
     const positions = calculateLayout(newMode);
@@ -411,6 +517,30 @@ export default function VisualsView() {
       });
     }
 
+    // Animate scroll overlay
+    if (scrollContainerRef.current) {
+      gsap.to(scrollContainerRef.current, {
+        opacity: newMode === "scroll" ? 1 : 0,
+        duration: 0.6,
+        delay: newMode === "scroll" ? 0.8 : 0,
+        ease: "power2.inOut",
+      });
+
+      // Start/stop scroll animation
+      if (newMode === "scroll") {
+        // Start animation after fade in
+        setTimeout(() => {
+          startScrollAnimation();
+        }, 1400);
+      } else {
+        // Stop animation
+        if (scrollAnimationRef.current) {
+          scrollAnimationRef.current.kill();
+          scrollAnimationRef.current = null;
+        }
+      }
+    }
+
     if (containerRef.current) {
       gsap.to(containerRef.current, {
         height: getContainerHeight(newMode),
@@ -424,6 +554,8 @@ export default function VisualsView() {
       // Apply special styling only AFTER transition completes
       if (newMode === "shelf") {
         setShelfStyleActive(true);
+      } else if (newMode === "tower") {
+        setTowerStyleActive(true);
       }
     }, 1200);
   };
@@ -459,6 +591,10 @@ export default function VisualsView() {
     // Set initial overlay opacities
     if (treeContainerRef.current) {
       treeContainerRef.current.style.opacity = viewMode === "tree" ? "1" : "0";
+    }
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.style.opacity =
+        viewMode === "scroll" ? "1" : "0";
     }
 
     setParticlesInitialized(true);
@@ -526,6 +662,13 @@ export default function VisualsView() {
         >
           Forest
         </button>
+        <button
+          className={`vis-btn ${viewMode === "scroll" ? "active" : ""}`}
+          onClick={() => animateToLayout("scroll")}
+          disabled={isTransitioning}
+        >
+          Scroll
+        </button>
       </div>
 
       {/* Context Card - Shows relevant comparison for current view */}
@@ -533,12 +676,16 @@ export default function VisualsView() {
         {viewMode === "tower" && (
           <>
             <div className="comparison-stat">
-              <span className="comparison-value">{comparisons.stackedMeters.toFixed(1)}m</span>
+              <span className="comparison-value">
+                {comparisons.stackedMeters.toFixed(1)}m
+              </span>
               <span className="comparison-label">IF STACKED</span>
             </div>
             <div className="comparison-divider" />
             <div className="comparison-stat">
-              <span className="comparison-value">{totalPages.toLocaleString()}</span>
+              <span className="comparison-value">
+                {totalPages.toLocaleString()}
+              </span>
               <span className="comparison-label">PAGES TOTAL</span>
             </div>
           </>
@@ -546,7 +693,9 @@ export default function VisualsView() {
         {viewMode === "tree" && (
           <>
             <div className="comparison-stat">
-              <span className="comparison-value">{comparisons.treesWorth.toFixed(2)}</span>
+              <span className="comparison-value">
+                {comparisons.treesWorth.toFixed(2)}
+              </span>
               <span className="comparison-label">TREES OF PAPER</span>
             </div>
             <div className="comparison-divider" />
@@ -564,8 +713,27 @@ export default function VisualsView() {
             </div>
             <div className="comparison-divider" />
             <div className="comparison-stat">
-              <span className="comparison-value">{Math.round(totalPages / books.length)}</span>
+              <span className="comparison-value">
+                {Math.round(totalPages / books.length)}
+              </span>
               <span className="comparison-label">AVG PAGES</span>
+            </div>
+          </>
+        )}
+        {viewMode === "scroll" && (
+          <>
+            <div className="comparison-stat">
+              <span className="comparison-value">
+                {comparisons.scrollLengthKm.toFixed(2)}km
+              </span>
+              <span className="comparison-label">SCROLL LENGTH</span>
+            </div>
+            <div className="comparison-divider" />
+            <div className="comparison-stat">
+              <span className="comparison-value">
+                {Math.round(comparisons.eiffelTowers)}
+              </span>
+              <span className="comparison-label">EIFFEL TOWERS</span>
             </div>
           </>
         )}
@@ -584,11 +752,13 @@ export default function VisualsView() {
             ref={(el) => {
               particleRefs.current[index] = el;
             }}
-            className={`vis-particle ${shelfStyleActive ? "shelf-mode" : ""}`}
+            className={`vis-particle ${shelfStyleActive ? "shelf-mode" : ""} ${towerStyleActive ? "tower-mode" : ""}`}
             title={`${book.title} by ${book.author} — ${book.pages} pages`}
           >
-            <span className={`vis-title ${shelfStyleActive ? "vertical" : ""}`}>{book.title}</span>
-            {book.texture}
+            <span className={`vis-title ${shelfStyleActive ? "vertical" : ""}`}>
+              {book.title}
+            </span>
+            {!towerStyleActive && book.texture}
           </div>
         ))}
 
@@ -626,11 +796,536 @@ export default function VisualsView() {
           </div>
           <div className="tree-legend">
             <p className="tree-legend-text">
-              {totalPages.toLocaleString()} pages = {comparisons.treesWorth.toFixed(2)} trees
+              {totalPages.toLocaleString()} pages ={" "}
+              {comparisons.treesWorth.toFixed(2)} trees
             </p>
             <p className="tree-legend-subtext">
               (1 tree ≈ 16,666 pages of paper)
             </p>
+          </div>
+        </div>
+
+        {/* Scroll overlay - shows when in scroll mode */}
+        <div
+          ref={scrollContainerRef}
+          className="scroll-overlay"
+          style={{ opacity: 0 }}
+        >
+          {/* Length display */}
+          <div className="scroll-length-display">
+            <span className="scroll-length-value">
+              {comparisons.scrollLengthKm.toFixed(2)}
+            </span>
+            <span className="scroll-length-unit">KILOMETERS</span>
+            <span className="scroll-length-meters">
+              ({Math.round(comparisons.scrollLengthMeters).toLocaleString()}m)
+            </span>
+          </div>
+
+          {/* The animated scroll ribbon */}
+          <div className="scroll-track">
+            <div className="scroll-ribbon">
+              {/* First set of books with distance markers */}
+              {scrollSegments.map((segment) =>
+                segment.type === "marker" ? (
+                  <div
+                    key={`a-marker-${segment.distance}`}
+                    className="scroll-marker"
+                  >
+                    <span className="scroll-marker-line" />
+                    <span className="scroll-marker-label">
+                      {segment.distance}m
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    key={`a-${segment.book.id}`}
+                    className="scroll-segment"
+                    style={{
+                      width: `${segment.book.pages * 0.3}px`,
+                      opacity: 0.3 + (segment.book.rating / 5) * 0.7,
+                    }}
+                  >
+                    <span className="scroll-book-title">
+                      {segment.book.title}
+                    </span>
+                    <span className="scroll-book-pages">
+                      {segment.book.pages}p
+                    </span>
+                  </div>
+                )
+              )}
+              {/* Duplicate for seamless loop */}
+              {scrollSegments.map((segment) =>
+                segment.type === "marker" ? (
+                  <div
+                    key={`b-marker-${segment.distance}`}
+                    className="scroll-marker"
+                  >
+                    <span className="scroll-marker-line" />
+                    <span className="scroll-marker-label">
+                      {segment.distance}m
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    key={`b-${segment.book.id}`}
+                    className="scroll-segment"
+                    style={{
+                      width: `${segment.book.pages * 0.3}px`,
+                      opacity: 0.3 + (segment.book.rating / 5) * 0.7,
+                    }}
+                  >
+                    <span className="scroll-book-title">
+                      {segment.book.title}
+                    </span>
+                    <span className="scroll-book-pages">
+                      {segment.book.pages}p
+                    </span>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+
+          {/* Comparison cards with multiple illustrations */}
+          <div className="scroll-comparisons">
+            {/* Titanics */}
+            <div className="scroll-compare-item">
+              <span className="scroll-compare-label">Titanics</span>
+              <span className="scroll-compare-value">
+                {Math.round(comparisons.titanics)}
+              </span>
+              <div className="scroll-illustration-grid titanic-grid">
+                {Array.from({ length: Math.round(comparisons.titanics) }).map(
+                  (_, i) => (
+                    <svg
+                      key={i}
+                      viewBox="0 0 40 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="mini-icon"
+                    >
+                      {/* Hull */}
+                      <path
+                        d="M2 14 L5 18 L35 18 L38 14 L36 14 L34 10 L6 10 L4 14 Z"
+                        stroke="currentColor"
+                        strokeWidth="0.5"
+                        fill="none"
+                      />
+                      {/* Deck structures */}
+                      <rect
+                        x="8"
+                        y="6"
+                        width="24"
+                        height="4"
+                        stroke="currentColor"
+                        strokeWidth="0.4"
+                        fill="none"
+                      />
+                      <rect
+                        x="10"
+                        y="3"
+                        width="8"
+                        height="3"
+                        stroke="currentColor"
+                        strokeWidth="0.3"
+                        fill="none"
+                      />
+                      <rect
+                        x="22"
+                        y="3"
+                        width="8"
+                        height="3"
+                        stroke="currentColor"
+                        strokeWidth="0.3"
+                        fill="none"
+                      />
+                      {/* Funnels */}
+                      <rect
+                        x="12"
+                        y="0"
+                        width="3"
+                        height="3"
+                        fill="currentColor"
+                        opacity="0.4"
+                      />
+                      <rect
+                        x="18"
+                        y="0"
+                        width="3"
+                        height="3"
+                        fill="currentColor"
+                        opacity="0.4"
+                      />
+                      <rect
+                        x="24"
+                        y="0"
+                        width="3"
+                        height="3"
+                        fill="currentColor"
+                        opacity="0.4"
+                      />
+                      <rect
+                        x="30"
+                        y="1"
+                        width="2"
+                        height="2"
+                        fill="currentColor"
+                        opacity="0.3"
+                      />
+                      {/* Portholes */}
+                      <circle
+                        cx="10"
+                        cy="12"
+                        r="0.8"
+                        fill="currentColor"
+                        opacity="0.3"
+                      />
+                      <circle
+                        cx="15"
+                        cy="12"
+                        r="0.8"
+                        fill="currentColor"
+                        opacity="0.3"
+                      />
+                      <circle
+                        cx="20"
+                        cy="12"
+                        r="0.8"
+                        fill="currentColor"
+                        opacity="0.3"
+                      />
+                      <circle
+                        cx="25"
+                        cy="12"
+                        r="0.8"
+                        fill="currentColor"
+                        opacity="0.3"
+                      />
+                      <circle
+                        cx="30"
+                        cy="12"
+                        r="0.8"
+                        fill="currentColor"
+                        opacity="0.3"
+                      />
+                    </svg>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* Statues of Liberty */}
+            <div className="scroll-compare-item">
+              <span className="scroll-compare-label">Statues of Liberty</span>
+              <span className="scroll-compare-value">
+                {Math.round(comparisons.statuesOfLiberty)}
+              </span>
+              <div className="scroll-illustration-grid statue-grid">
+                {Array.from({
+                  length: Math.round(comparisons.statuesOfLiberty),
+                }).map((_, i) => (
+                  <svg
+                    key={i}
+                    viewBox="0 0 16 28"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="mini-icon"
+                  >
+                    {/* Pedestal */}
+                    <rect
+                      x="4"
+                      y="22"
+                      width="8"
+                      height="6"
+                      stroke="currentColor"
+                      strokeWidth="0.4"
+                      fill="none"
+                    />
+                    <rect
+                      x="5"
+                      y="20"
+                      width="6"
+                      height="2"
+                      stroke="currentColor"
+                      strokeWidth="0.3"
+                      fill="none"
+                    />
+                    {/* Body/Robe */}
+                    <path
+                      d="M8 20 L6 12 L5 12 L4 20 L8 20"
+                      stroke="currentColor"
+                      strokeWidth="0.4"
+                      fill="none"
+                    />
+                    <path
+                      d="M8 20 L10 12 L11 12 L12 20 L8 20"
+                      stroke="currentColor"
+                      strokeWidth="0.4"
+                      fill="none"
+                    />
+                    {/* Torso */}
+                    <path
+                      d="M6 12 L7 8 L9 8 L10 12"
+                      stroke="currentColor"
+                      strokeWidth="0.4"
+                      fill="none"
+                    />
+                    {/* Head with crown */}
+                    <circle
+                      cx="8"
+                      cy="6"
+                      r="2"
+                      stroke="currentColor"
+                      strokeWidth="0.4"
+                      fill="none"
+                    />
+                    {/* Crown spikes */}
+                    <line
+                      x1="6"
+                      y1="4"
+                      x2="5"
+                      y2="2"
+                      stroke="currentColor"
+                      strokeWidth="0.3"
+                    />
+                    <line
+                      x1="7"
+                      y1="4"
+                      x2="6.5"
+                      y2="1.5"
+                      stroke="currentColor"
+                      strokeWidth="0.3"
+                    />
+                    <line
+                      x1="8"
+                      y1="4"
+                      x2="8"
+                      y2="1"
+                      stroke="currentColor"
+                      strokeWidth="0.3"
+                    />
+                    <line
+                      x1="9"
+                      y1="4"
+                      x2="9.5"
+                      y2="1.5"
+                      stroke="currentColor"
+                      strokeWidth="0.3"
+                    />
+                    <line
+                      x1="10"
+                      y1="4"
+                      x2="11"
+                      y2="2"
+                      stroke="currentColor"
+                      strokeWidth="0.3"
+                    />
+                    {/* Torch arm */}
+                    <line
+                      x1="11"
+                      y1="10"
+                      x2="14"
+                      y2="4"
+                      stroke="currentColor"
+                      strokeWidth="0.4"
+                    />
+                    {/* Torch */}
+                    <ellipse
+                      cx="14"
+                      cy="3"
+                      rx="1.5"
+                      ry="2"
+                      fill="currentColor"
+                      opacity="0.5"
+                    />
+                    {/* Tablet arm */}
+                    <line
+                      x1="5"
+                      y1="10"
+                      x2="3"
+                      y2="14"
+                      stroke="currentColor"
+                      strokeWidth="0.4"
+                    />
+                    <rect
+                      x="2"
+                      y="12"
+                      width="2"
+                      height="4"
+                      stroke="currentColor"
+                      strokeWidth="0.3"
+                      fill="none"
+                    />
+                  </svg>
+                ))}
+              </div>
+            </div>
+
+            {/* Eiffel Towers */}
+            <div className="scroll-compare-item">
+              <span className="scroll-compare-label">Eiffel Towers</span>
+              <span className="scroll-compare-value">
+                {Math.round(comparisons.eiffelTowers)}
+              </span>
+              <div className="scroll-illustration-grid tower-grid">
+                {Array.from({
+                  length: Math.round(comparisons.eiffelTowers),
+                }).map((_, i) => (
+                  <svg
+                    key={i}
+                    viewBox="0 0 24 40"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="mini-icon"
+                  >
+                    {/* Antenna/spire */}
+                    <line
+                      x1="12"
+                      y1="0"
+                      x2="12"
+                      y2="4"
+                      stroke="currentColor"
+                      strokeWidth="0.5"
+                    />
+                    {/* Top section */}
+                    <path
+                      d="M11 4 L10.5 8 L13.5 8 L13 4 Z"
+                      stroke="currentColor"
+                      strokeWidth="0.4"
+                      fill="none"
+                    />
+                    {/* Upper platform */}
+                    <rect
+                      x="9.5"
+                      y="8"
+                      width="5"
+                      height="1"
+                      stroke="currentColor"
+                      strokeWidth="0.3"
+                      fill="currentColor"
+                      opacity="0.2"
+                    />
+                    {/* Middle section with taper */}
+                    <path
+                      d="M10 9 L8 18 L16 18 L14 9 Z"
+                      stroke="currentColor"
+                      strokeWidth="0.4"
+                      fill="none"
+                    />
+                    {/* Middle platform (main observation deck) */}
+                    <rect
+                      x="6.5"
+                      y="18"
+                      width="11"
+                      height="1.5"
+                      stroke="currentColor"
+                      strokeWidth="0.3"
+                      fill="currentColor"
+                      opacity="0.2"
+                    />
+                    {/* Lower section - four legs spreading out */}
+                    <path
+                      d="M7 19.5 Q6 28 1 39"
+                      stroke="currentColor"
+                      strokeWidth="0.5"
+                      fill="none"
+                    />
+                    <path
+                      d="M17 19.5 Q18 28 23 39"
+                      stroke="currentColor"
+                      strokeWidth="0.5"
+                      fill="none"
+                    />
+                    {/* Inner leg lines */}
+                    <path
+                      d="M9 19.5 Q9.5 28 7 39"
+                      stroke="currentColor"
+                      strokeWidth="0.4"
+                      fill="none"
+                    />
+                    <path
+                      d="M15 19.5 Q14.5 28 17 39"
+                      stroke="currentColor"
+                      strokeWidth="0.4"
+                      fill="none"
+                    />
+                    {/* Arch between the legs */}
+                    <path
+                      d="M5 32 Q12 26 19 32"
+                      stroke="currentColor"
+                      strokeWidth="0.4"
+                      fill="none"
+                    />
+                    {/* Cross bracing / lattice hints */}
+                    <line
+                      x1="3"
+                      y1="35"
+                      x2="7"
+                      y2="32"
+                      stroke="currentColor"
+                      strokeWidth="0.3"
+                      opacity="0.5"
+                    />
+                    <line
+                      x1="21"
+                      y1="35"
+                      x2="17"
+                      y2="32"
+                      stroke="currentColor"
+                      strokeWidth="0.3"
+                      opacity="0.5"
+                    />
+                    <line
+                      x1="4"
+                      y1="37"
+                      x2="8"
+                      y2="34"
+                      stroke="currentColor"
+                      strokeWidth="0.3"
+                      opacity="0.5"
+                    />
+                    <line
+                      x1="20"
+                      y1="37"
+                      x2="16"
+                      y2="34"
+                      stroke="currentColor"
+                      strokeWidth="0.3"
+                      opacity="0.5"
+                    />
+                    {/* Base */}
+                    <line
+                      x1="0"
+                      y1="39"
+                      x2="8"
+                      y2="39"
+                      stroke="currentColor"
+                      strokeWidth="0.5"
+                    />
+                    <line
+                      x1="16"
+                      y1="39"
+                      x2="24"
+                      y2="39"
+                      stroke="currentColor"
+                      strokeWidth="0.5"
+                    />
+                  </svg>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Page counter */}
+          <div className="scroll-page-counter">
+            <span className="scroll-counter-value">
+              {totalPages.toLocaleString()}
+            </span>
+            <span className="scroll-counter-label">
+              pages stitched together
+            </span>
           </div>
         </div>
       </div>
@@ -646,11 +1341,15 @@ export default function VisualsView() {
           <span className="stat-lbl">PAGES</span>
         </div>
         <div className="stat-item">
-          <span className="stat-val">{Math.round(totalPages / books.length)}</span>
+          <span className="stat-val">
+            {Math.round(totalPages / books.length)}
+          </span>
           <span className="stat-lbl">AVG LENGTH</span>
         </div>
         <div className="stat-item">
-          <span className="stat-val">{Math.max(...books.map((b) => b.pages))}</span>
+          <span className="stat-val">
+            {Math.max(...books.map((b) => b.pages))}
+          </span>
           <span className="stat-lbl">LONGEST</span>
         </div>
       </div>

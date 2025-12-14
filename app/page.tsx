@@ -4,14 +4,15 @@ import { useState, Suspense, lazy } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 // Lazy load the views
+const LandingView = lazy(() => import("./components/LandingView"));
 const TimelineView = lazy(() => import("./components/TimelineView"));
 const AnalyticsView = lazy(() => import("./components/AnalyticsView"));
 const VisualsView = lazy(() => import("./components/VisualsView"));
 
-type ViewType = "timeline" | "analytics" | "visuals";
+type ViewType = "landing" | "timeline" | "analytics" | "visuals";
 
 export default function Home() {
-  const [activeView, setActiveView] = useState<ViewType>("timeline");
+  const [activeView, setActiveView] = useState<ViewType>("landing");
 
   const switchView = (view: ViewType) => {
     setActiveView(view);
@@ -24,15 +25,27 @@ export default function Home() {
 
   return (
     <>
-      {/* Header */}
-      <header className="fixed top-6 left-6 z-50 mix-blend-difference text-white">
-        <h1 className="text-xs font-bold tracking-widest uppercase">
-          Bookshelf
-        </h1>
-      </header>
+      {/* Header Logo */}
+      <button
+        className="home-icon"
+        onClick={() => switchView("landing")}
+        aria-label="Go to home"
+      >
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="4" width="4" height="16" rx="1" fill="currentColor" />
+          <rect x="9" y="6" width="4" height="14" rx="1" fill="currentColor" opacity="0.7" />
+          <rect x="15" y="2" width="4" height="18" rx="1" fill="currentColor" opacity="0.4" />
+        </svg>
+      </button>
 
       {/* Navigation Tabs */}
-      <nav className="nav-wrapper">
+      <nav className={`nav-wrapper ${activeView === "landing" ? "nav-landing" : ""}`}>
+        <button
+          className={`nav-tab ${activeView === "landing" ? "active" : ""}`}
+          onClick={() => switchView("landing")}
+        >
+          HOME
+        </button>
         <button
           className={`nav-tab ${activeView === "timeline" ? "active" : ""}`}
           onClick={() => switchView("timeline")}
@@ -52,6 +65,21 @@ export default function Home() {
           VISUALS
         </button>
       </nav>
+
+      {/* VIEW 0: LANDING */}
+      <div
+        className={`view-section ${activeView === "landing" ? "active" : ""}`}
+      >
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center min-h-screen">
+              <span className="text-accent-color">Loading...</span>
+            </div>
+          }
+        >
+          {activeView === "landing" && <LandingView onNavigate={switchView} />}
+        </Suspense>
+      </div>
 
       {/* VIEW 1: TIMELINE */}
       <div
