@@ -10,7 +10,10 @@
       "Bash(npx tailwindcss:*)",
       "Bash(cat:*)",
       "Bash(rm:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(grep:*)",
+      "Bash(gh run list:*)",
+      "Bash(git push)"
     ],
     "deny": [],
     "ask": []

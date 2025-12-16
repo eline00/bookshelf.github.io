@@ -105,6 +105,36 @@ function generateTreeData(fillPercent: number = 1): {
   return { lines };
 }
 
+// Seeded random for consistent "messy" book positioning
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed * 9999) * 10000;
+  return x - Math.floor(x);
+}
+
+// Typography styles for book spines - dramatic brutalist variety
+const spineTypography = [
+  // Bold condensed uppercase - classic
+  { fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase" as const, fontStyle: "normal" as const, fontSize: "9px", titleColor: "rgba(255,255,255,0.95)", authorColor: "rgba(255,255,255,0.5)", authorStyle: "normal" as const, separator: "—" },
+  // Thin elegant with wide tracking
+  { fontWeight: 200, letterSpacing: "0.4em", textTransform: "uppercase" as const, fontStyle: "normal" as const, fontSize: "8px", titleColor: "rgba(220,180,140,0.9)", authorColor: "rgba(220,180,140,0.5)", authorStyle: "normal" as const, separator: "·" },
+  // Italic serif-like feel
+  { fontWeight: 600, letterSpacing: "0.02em", textTransform: "none" as const, fontStyle: "italic" as const, fontSize: "11px", titleColor: "rgba(200,200,220,0.9)", authorColor: "rgba(200,200,220,0.6)", authorStyle: "normal" as const, separator: "/" },
+  // Stark minimal
+  { fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase" as const, fontStyle: "normal" as const, fontSize: "7px", titleColor: "rgba(255,255,255,0.8)", authorColor: "rgba(255,255,255,0.4)", authorStyle: "italic" as const, separator: "" },
+  // Heavy black
+  { fontWeight: 900, letterSpacing: "-0.02em", textTransform: "none" as const, fontStyle: "normal" as const, fontSize: "12px", titleColor: "rgba(255,240,200,0.95)", authorColor: "rgba(255,240,200,0.5)", authorStyle: "normal" as const, separator: "•" },
+  // Delicate spaced
+  { fontWeight: 300, letterSpacing: "0.35em", textTransform: "uppercase" as const, fontStyle: "normal" as const, fontSize: "6px", titleColor: "rgba(180,200,220,0.9)", authorColor: "rgba(180,200,220,0.55)", authorStyle: "normal" as const, separator: ":" },
+  // Bold italic accent
+  { fontWeight: 700, letterSpacing: "0.05em", textTransform: "none" as const, fontStyle: "italic" as const, fontSize: "10px", titleColor: "rgba(255,200,180,0.9)", authorColor: "rgba(255,200,180,0.5)", authorStyle: "normal" as const, separator: "—" },
+  // Ultra condensed
+  { fontWeight: 800, letterSpacing: "-0.03em", textTransform: "uppercase" as const, fontStyle: "normal" as const, fontSize: "11px", titleColor: "rgba(240,240,240,0.9)", authorColor: "rgba(240,240,240,0.45)", authorStyle: "italic" as const, separator: "|" },
+  // Soft and warm
+  { fontWeight: 500, letterSpacing: "0.08em", textTransform: "none" as const, fontStyle: "normal" as const, fontSize: "9px", titleColor: "rgba(255,220,200,0.85)", authorColor: "rgba(255,220,200,0.5)", authorStyle: "italic" as const, separator: "~" },
+  // Sharp modern
+  { fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" as const, fontStyle: "normal" as const, fontSize: "8px", titleColor: "rgba(200,220,255,0.9)", authorColor: "rgba(200,220,255,0.5)", authorStyle: "normal" as const, separator: "+" },
+];
+
 // Pre-calculate book data with consistent textures
 function generateBookData() {
   const sortedBooks = [...books].sort(
@@ -120,10 +150,34 @@ function generateBookData() {
 
     const texture = getTexture(book.genre, textureLength);
 
+    // Generate consistent random values for this book's positioning
+    const seed = index + book.title.length * 7;
+    const widthVariation = seededRandom(seed) * 0.5 + 0.6; // 60% to 110% of base width
+
+    // Create messy pile with alternating left/right offsets - no rotation
+    const pattern = index % 3;
+    let baseOffset: number;
+    if (pattern === 0) baseOffset = -25; // left
+    else if (pattern === 1) baseOffset = 20; // right
+    else baseOffset = -8; // slightly left
+
+    // Add randomness to offset
+    const randomOffset = (seededRandom(seed + 1) - 0.5) * 30;
+    const xOffset = baseOffset + randomOffset;
+
+    // No rotation - books stay flat
+    const rotation = 0;
+
+    const typography = spineTypography[index % spineTypography.length];
+
     return {
       ...book,
       texture,
       index,
+      widthVariation,
+      xOffset,
+      rotation,
+      typography,
     };
   });
 }
@@ -159,6 +213,7 @@ export default function VisualsView() {
   const particleRefs = useRef<(HTMLDivElement | null)[]>([]);
   const treeContainerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollRibbonRef = useRef<HTMLDivElement>(null);
   const scrollAnimationRef = useRef<gsap.core.Tween | null>(null);
 
   const totalPages = books.reduce((sum, b) => sum + b.pages, 0);
@@ -291,24 +346,30 @@ export default function VisualsView() {
     const positions: LayoutPosition[] = [];
 
     if (mode === "tower") {
-      // TOWER: Books stacked like a pile, spine facing front
+      // TOWER: Books stacked like a messy pile, spine facing front
       // Height (spine thickness) based on page count
-      const bookWidth = Math.min(500, containerWidth - 80); // Fixed width for all books
+      const baseBookWidth = Math.min(420, containerWidth - 120); // Base width for books
       let currentY = 0;
 
       // Stack from bottom to top (reverse order so newest on top)
       const reversedBooks = [...bookData].reverse();
 
       reversedBooks.forEach((book, i) => {
-        // Spine thickness: min 12px, max 40px based on pages
-        const spineHeight = Math.max(12, Math.min(40, book.pages * 0.06));
+        // Spine thickness: min 14px, max 44px based on pages
+        const spineHeight = Math.max(14, Math.min(44, book.pages * 0.07));
+
+        // Apply width variation - each book has different width
+        const bookWidth = baseBookWidth * book.widthVariation;
+
+        // Apply horizontal offset for messy stack effect
+        const xPos = centerX - bookWidth / 2 + book.xOffset;
 
         positions.push({
           width: bookWidth,
           height: spineHeight,
-          x: centerX - bookWidth / 2,
+          x: xPos,
           y: currentY,
-          rotation: 0,
+          rotation: book.rotation,
           fontSize: "11px",
           paddingLeft: "16px",
           zIndex: bookData.length - i,
@@ -422,11 +483,11 @@ export default function VisualsView() {
   // Get container height based on layout
   const getContainerHeight = (mode: ViewMode): number => {
     if (mode === "tower") {
-      // Calculate total height based on spine thicknesses
+      // Calculate total height based on spine thicknesses (must match calculateLayout values)
       const totalSpineHeight = bookData.reduce((sum, b) => {
-        return sum + Math.max(12, Math.min(40, b.pages * 0.06));
+        return sum + Math.max(14, Math.min(44, b.pages * 0.07));
       }, 0);
-      return totalSpineHeight + 100;
+      return totalSpineHeight + 160; // Extra padding to avoid overlap with stats footer
     } else if (mode === "tree") {
       return 650; // Crown height (450) + trunk (80) + padding
     } else if (mode === "shelf") {
@@ -454,19 +515,21 @@ export default function VisualsView() {
 
   // Start the continuous scroll animation
   const startScrollAnimation = () => {
-    const scrollRibbon = document.querySelector(
-      ".scroll-ribbon"
-    ) as HTMLElement;
-    if (!scrollRibbon) return;
+    if (!scrollRibbonRef.current) return;
+
+    // Kill any existing animation
+    if (scrollAnimationRef.current) {
+      scrollAnimationRef.current.kill();
+    }
 
     // Reset position
-    gsap.set(scrollRibbon, { x: 0 });
+    gsap.set(scrollRibbonRef.current, { x: 0 });
 
     // Calculate the width of one segment (half of total since we duplicate)
-    const segmentWidth = scrollRibbon.scrollWidth / 2;
+    const segmentWidth = scrollRibbonRef.current.scrollWidth / 2;
 
     // Create infinite scroll animation
-    scrollAnimationRef.current = gsap.to(scrollRibbon, {
+    scrollAnimationRef.current = gsap.to(scrollRibbonRef.current, {
       x: -segmentWidth,
       duration: 60, // Slow, hypnotic scroll
       ease: "none",
@@ -528,10 +591,10 @@ export default function VisualsView() {
 
       // Start/stop scroll animation
       if (newMode === "scroll") {
-        // Start animation after fade in
+        // Start animation after fade in completes
         setTimeout(() => {
           startScrollAnimation();
-        }, 1400);
+        }, 1600);
       } else {
         // Stop animation
         if (scrollAnimationRef.current) {
@@ -671,7 +734,8 @@ export default function VisualsView() {
         </button>
       </div>
 
-      {/* Context Card - Shows relevant comparison for current view */}
+      {/* Context Card - Shows relevant comparison for current view (hidden for scroll) */}
+      {viewMode !== "scroll" && (
       <div className="comparison-card">
         {viewMode === "tower" && (
           <>
@@ -720,24 +784,8 @@ export default function VisualsView() {
             </div>
           </>
         )}
-        {viewMode === "scroll" && (
-          <>
-            <div className="comparison-stat">
-              <span className="comparison-value">
-                {comparisons.scrollLengthKm.toFixed(2)}km
-              </span>
-              <span className="comparison-label">SCROLL LENGTH</span>
-            </div>
-            <div className="comparison-divider" />
-            <div className="comparison-stat">
-              <span className="comparison-value">
-                {Math.round(comparisons.eiffelTowers)}
-              </span>
-              <span className="comparison-label">EIFFEL TOWERS</span>
-            </div>
-          </>
-        )}
       </div>
+      )}
 
       {/* Dynamic Particle Container */}
       <div
@@ -755,9 +803,41 @@ export default function VisualsView() {
             className={`vis-particle ${shelfStyleActive ? "shelf-mode" : ""} ${towerStyleActive ? "tower-mode" : ""}`}
             title={`${book.title} by ${book.author} — ${book.pages} pages`}
           >
-            <span className={`vis-title ${shelfStyleActive ? "vertical" : ""}`}>
-              {book.title}
-            </span>
+            {towerStyleActive ? (
+              <span
+                className="vis-title tower-title"
+                style={{
+                  fontWeight: book.typography.fontWeight,
+                  letterSpacing: book.typography.letterSpacing,
+                  textTransform: book.typography.textTransform,
+                  fontStyle: book.typography.fontStyle,
+                  fontSize: book.typography.fontSize,
+                  color: book.typography.titleColor,
+                }}
+              >
+                {book.title}
+                {book.typography.separator && (
+                  <span className="spine-separator" style={{ color: book.typography.authorColor, margin: "0 0.5em" }}>
+                    {book.typography.separator}
+                  </span>
+                )}
+                <span
+                  className="spine-author"
+                  style={{
+                    fontWeight: Math.max(300, book.typography.fontWeight - 200),
+                    fontStyle: book.typography.authorStyle,
+                    color: book.typography.authorColor,
+                    letterSpacing: book.typography.letterSpacing,
+                  }}
+                >
+                  {book.author.split(" ").pop()}
+                </span>
+              </span>
+            ) : (
+              <span className={`vis-title ${shelfStyleActive ? "vertical" : ""}`}>
+                {book.title}
+              </span>
+            )}
             {!towerStyleActive && book.texture}
           </div>
         ))}
@@ -811,6 +891,40 @@ export default function VisualsView() {
           className="scroll-overlay"
           style={{ opacity: 0 }}
         >
+          {/* Visual legend explaining the concept */}
+          <div className="scroll-legend">
+            <div className="scroll-legend-diagram">
+              {/* Book icon */}
+              <div className="scroll-legend-book">
+                <div className="legend-book-cover" />
+                <div className="legend-book-pages">
+                  <span>28cm</span>
+                </div>
+              </div>
+              {/* Arrow */}
+              <div className="scroll-legend-arrow">
+                <span className="arrow-line" />
+                <span className="arrow-head">→</span>
+              </div>
+              {/* Pages unfolding into scroll */}
+              <div className="scroll-legend-unfolded">
+                <div className="legend-page" />
+                <div className="legend-page" />
+                <div className="legend-page" />
+                <div className="legend-page-fade" />
+              </div>
+              {/* Equals */}
+              <div className="scroll-legend-equals">=</div>
+              {/* Result */}
+              <div className="scroll-legend-result">
+                <span className="result-formula">{totalPages.toLocaleString()} pages × 28cm</span>
+              </div>
+            </div>
+            <p className="scroll-legend-text">
+              If every page from every book were attached end-to-end
+            </p>
+          </div>
+
           {/* Length display */}
           <div className="scroll-length-display">
             <span className="scroll-length-value">
@@ -824,7 +938,7 @@ export default function VisualsView() {
 
           {/* The animated scroll ribbon */}
           <div className="scroll-track">
-            <div className="scroll-ribbon">
+            <div className="scroll-ribbon" ref={scrollRibbonRef}>
               {/* First set of books with distance markers */}
               {scrollSegments.map((segment) =>
                 segment.type === "marker" ? (
