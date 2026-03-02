@@ -4,9 +4,6 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
-  books,
-  yearlyGoals,
-  bookCoverColors,
   getBookCover,
   getBookVibe,
   Book,
@@ -14,7 +11,12 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function TimelineView() {
+interface TimelineViewProps {
+  books: Book[];
+  yearlyGoals: Record<number, number>;
+}
+
+export default function TimelineView({ books, yearlyGoals }: TimelineViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -27,7 +29,7 @@ export default function TimelineView() {
     return [...books].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
-  }, []);
+  }, [books]);
 
   // Group by Year
   const grouped: Record<number, Book[]> = { 2024: [], 2025: [], 2026: [] };
@@ -141,7 +143,7 @@ export default function TimelineView() {
   const handleMouseEnter = (book: Book) => {
     setIsHovering(true);
     if (bgRef.current) {
-      const color = bookCoverColors[book.id] || "#232526";
+      const color = book.coverColor || "#232526";
       bgRef.current.style.background = `radial-gradient(ellipse at center, ${color}aa 0%, ${color}44 50%, transparent 80%)`;
       bgRef.current.style.opacity = "0.8";
     }
@@ -388,7 +390,7 @@ export default function TimelineView() {
                   className="artifact-cover"
                   style={{
                     boxShadow: `0 20px 40px ${
-                      bookCoverColors[selectedBook.id] || "#000"
+                      selectedBook.coverColor || "#000"
                     }88`,
                   }}
                 />

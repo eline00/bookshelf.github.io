@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo } from "react";
 import { gsap } from "gsap";
-import { books } from "../data";
+import type { Book } from "../data";
 
 type ViewMode = "tower" | "tree" | "shelf" | "scroll";
 
@@ -136,7 +136,7 @@ const spineTypography = [
 ];
 
 // Pre-calculate book data with consistent textures
-function generateBookData() {
+function generateBookData(books: Book[]) {
   const sortedBooks = [...books].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
@@ -203,7 +203,11 @@ const viewDescriptions: Record<ViewMode, { title: string; subtitle: string }> =
     },
   };
 
-export default function VisualsView() {
+interface VisualsViewProps {
+  books: Book[];
+}
+
+export default function VisualsView({ books }: VisualsViewProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("tower");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [particlesInitialized, setParticlesInitialized] = useState(false);
@@ -219,7 +223,7 @@ export default function VisualsView() {
   const totalPages = books.reduce((sum, b) => sum + b.pages, 0);
 
   // Pre-generate book data
-  const bookData = useMemo(() => generateBookData(), []);
+  const bookData = useMemo(() => generateBookData(books), [books]);
 
   // Calculate interesting comparisons
   const comparisons = useMemo(() => {

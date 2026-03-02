@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { books, Book } from "../data";
+import type { Book } from "../data";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -37,7 +37,7 @@ interface YearStats {
   uniqueGenres: number;
 }
 
-function calculateYearStats(year: number): YearStats {
+function calculateYearStats(year: number, books: Book[]): YearStats {
   const yearBooks = books.filter((b) => b.year === year);
 
   // Sort by rating for best/worst
@@ -246,7 +246,11 @@ function calculateYearStats(year: number): YearStats {
   };
 }
 
-export default function AnalyticsView() {
+interface AnalyticsViewProps {
+  books: Book[];
+}
+
+export default function AnalyticsView({ books }: AnalyticsViewProps) {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -256,13 +260,13 @@ export default function AnalyticsView() {
   const availableYears = useMemo(() => {
     const years = [...new Set(books.map((b) => b.year))].sort((a, b) => b - a);
     return years;
-  }, []);
+  }, [books]);
 
   // Get stats for selected year
   const stats = useMemo(() => {
     if (!selectedYear) return null;
-    return calculateYearStats(selectedYear);
-  }, [selectedYear]);
+    return calculateYearStats(selectedYear, books);
+  }, [selectedYear, books]);
 
   // Setup scroll-triggered animations when year is selected
   useEffect(() => {
