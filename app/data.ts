@@ -140,7 +140,13 @@ export const getBookVibe = (book: Book): string => {
   // Pace words based on pages
   const paceWords =
     book.pages > 700
-      ? ["marathon read", "epic length", "commitment era", "long haul", "tome energy"]
+      ? [
+          "marathon read",
+          "epic length",
+          "commitment era",
+          "long haul",
+          "tome energy",
+        ]
       : book.pages > 500
         ? ["substantial", "meaty", "chunky", "deep dive"]
         : book.pages > 300
@@ -152,7 +158,9 @@ export const getBookVibe = (book: Book): string => {
   const endDate = new Date(book.date);
   const daysToRead = Math.max(
     1,
-    Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+    Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+    ),
   );
   const pagesPerDay = book.pages / daysToRead;
 
@@ -166,7 +174,12 @@ export const getBookVibe = (book: Book): string => {
   // Re-read indicator
   const rereadVibes =
     book.readCount > 1
-      ? ["comfort reread", "returning home", "familiar embrace", "nostalgia hit"]
+      ? [
+          "comfort reread",
+          "returning home",
+          "familiar embrace",
+          "nostalgia hit",
+        ]
       : [];
 
   // Build the vibe string
