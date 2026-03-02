@@ -35,6 +35,8 @@ jobs:
       - name: Build Next.js app
         run: npm run build
         working-directory: ./
+        env:
+          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ vars.CLOUDINARY_CLOUD_NAME }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

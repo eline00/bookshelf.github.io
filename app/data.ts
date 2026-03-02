@@ -21,13 +21,13 @@ export interface Book {
 }
 
 // Helper function to get cover image URL
-// Uses local images stored in /public/covers/
-// Includes basePath for GitHub Pages deployment
-const basePath = process.env.NODE_ENV === 'production' ? '/bookshelf.github.io' : '';
+// Uses Cloudinary for image hosting with auto-format and auto-quality
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const basePath =
+  process.env.NODE_ENV === "production" ? "/bookshelf.github.io" : "";
 
 export const getBookCover = (book: Book): string => {
-  // All covers are stored locally by book ID
-  return `${basePath}/covers/${book.id}.jpg`;
+  return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${book.id}`;
 };
 
 // Generate Spotify daylist-style book description
