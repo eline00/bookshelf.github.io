@@ -1,16 +1,18 @@
 "use client";
 
 import { useMemo } from "react";
-import { books, yearlyGoals } from "../data";
+import type { Book } from "../data";
 
 // Consistent number formatting to avoid hydration mismatch
 const formatNumber = (n: number): string => n.toLocaleString("en-US");
 
 interface LandingViewProps {
   onNavigate: (view: "timeline" | "analytics" | "visuals") => void;
+  books: Book[];
+  yearlyGoals: Record<number, number>;
 }
 
-export default function LandingView({ onNavigate }: LandingViewProps) {
+export default function LandingView({ onNavigate, books, yearlyGoals }: LandingViewProps) {
   // Calculate summary stats
   const stats = useMemo(() => {
     const currentYear = new Date().getFullYear();
@@ -68,7 +70,7 @@ export default function LandingView({ onNavigate }: LandingViewProps) {
       treesWorth,
       uniqueAuthors: Object.keys(authorCounts).length,
     };
-  }, []);
+  }, [books, yearlyGoals]);
 
   return (
     <div id="landing-wrapper">

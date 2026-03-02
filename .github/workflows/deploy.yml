@@ -24,8 +24,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: package-lock.json
 
       - name: Install dependencies
@@ -35,6 +35,8 @@ jobs:
       - name: Build Next.js app
         run: npm run build
         working-directory: ./
+        env:
+          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ vars.CLOUDINARY_CLOUD_NAME }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
