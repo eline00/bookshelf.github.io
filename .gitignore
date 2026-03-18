@@ -42,3 +42,8 @@ next-env.d.ts
 
 # source data
 source.txt
+
+scripts/
+patches/
+
+*.patch
